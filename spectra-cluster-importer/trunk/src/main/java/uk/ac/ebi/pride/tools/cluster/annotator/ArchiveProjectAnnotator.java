@@ -67,12 +67,16 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
 
     @Override
     public void annotate(String projectAccession) {
+        logger.info("Trying to annotation project {}", projectAccession);
+
         ProjectRepository projectRepository = archiveRepositoryBuilder.getProjectRepository();
         Project project = projectRepository.findByAccession(projectAccession);
 
         // check whether project is already public
         if (!project.isPublicProject()) {
-            throw new IllegalStateException("Project must be public: " + project.getAccession());
+            String msg = "Project must be public: " + project.getAccession();
+            logger.error(msg);
+            throw new IllegalStateException(msg);
         }
 
         // project file path
@@ -82,8 +86,11 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         AssayRepository assayRepository = archiveRepositoryBuilder.getAssayRepository();
         List<Assay> assays = assayRepository.findAllByProjectId(project.getId());
         for (Assay assay : assays) {
+            logger.info("Storing assay {} for project {}", assay.getAccession(), project.getAccession());
             loadMetaDataByAssay(project, projectFilePath, assay);
         }
+
+        logger.info("Project annotation has finished {}", projectAccession);
     }
 
     /**
@@ -101,9 +108,13 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
 
         File mzTabFile = findMzTabFile(projectFilePath, assayFiles);
         if (mzTabFile != null) {
+            logger.info("Found mzTab file: {}", mzTabFile.getAbsolutePath());
+
             List<File> mgfFiles = findMgfFiles(projectFilePath, assayFiles);
 
             if (mgfFiles != null && !mgfFiles.isEmpty()) {
+                logger.info("Found {} number of MGF files", mgfFiles.size());
+
                 // parse mztab object
                 try {
                     loadMetaDataByMgfs(project, assay, mzTabFile, mgfFiles);
@@ -129,10 +140,10 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
 
         AssaySummary assaySummary = SummaryFactory.summariseAssay(project, assay);
         clusterMetaDataLoader.saveAssay(assaySummary);
-
-        logger.info("Storing assay {} for project {}", assay.getAccession(), project.getAccession());
+        logger.info("Assay summary annotated. Assay database id: {}", assaySummary.getId());
 
         for (File mgfFile : mgfFiles) {
+            logger.info("loading mgf file {}", mgfFile.getAbsolutePath());
             loadMetaDataByMgf(assaySummary, mzTabIndexer, mgfFile);
         }
     }
@@ -214,8 +225,9 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
     private File findMzTabFile(String projectFilePath, List<ProjectFile> assayFiles) {
         for (ProjectFile assayFile : assayFiles) {
             if (assayFile.getFileSource().equals(ProjectFileSource.GENERATED) &&
-                    assayFile.getFileName().endsWith(Constants.PRIDE_MZTAB_SUFFIX)) {
-                File file = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + assayFile.getFileName());
+                    assayFile.getFileName().endsWith(Constants.PRIDE_MZTAB_SUFFIX_GZIPPED)) {
+                String fileName = assayFile.getFileName().substring(0, assayFile.getFileName().length() - 3);
+                File file = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + fileName);
                 if (file.exists())
                     return file;
             }
@@ -236,8 +248,9 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
 
         for (ProjectFile assayFile : assayFiles) {
             if (assayFile.getFileSource().equals(ProjectFileSource.GENERATED) &&
-                    assayFile.getFileName().endsWith(Constants.PRIDE_MGF_SUFFIX)) {
-                File projectFile = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + assayFile.getFileName());
+                    assayFile.getFileName().endsWith(Constants.PRIDE_MGF_SUFFIX_GZIPPED)) {
+                String fileName = assayFile.getFileName().substring(0, assayFile.getFileName().length() - 3);
+                File projectFile = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + fileName);
                 if (projectFile.exists())
                     mgfFiles.add(projectFile);
             }

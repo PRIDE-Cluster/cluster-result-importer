@@ -104,6 +104,7 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
         parameters.put("spectrum_fk", psm.getSpectrumId());
         parameters.put("assay_fk", psm.getAssayId());
         parameters.put("archive_psm_id", psm.getArchivePSMId());
+        parameters.put("sequence", psm.getSequence());
 
         if (psm.getModifications() != null)
             parameters.put("modifications", psm.getModifications());
@@ -130,7 +131,7 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
             parameters.put("pre_amino_acid", psm.getPreAminoAcid());
 
         if (psm.getPostAminoAcid() != null)
-            parameters.put("post_amino_acid", psm.getSequence());
+            parameters.put("post_amino_acid", psm.getPostAminoAcid());
 
         parameters.put("delta_mz", psm.getDeltaMZ());
 
