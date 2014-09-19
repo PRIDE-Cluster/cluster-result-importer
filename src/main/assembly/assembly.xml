@@ -24,9 +24,6 @@
     <dependencySet>
     <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib/</outputDirectory>
-      <excludes>
-        <exclude>junit:junit</exclude>
-      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>
