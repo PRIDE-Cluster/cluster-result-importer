@@ -95,8 +95,10 @@ public final class SummaryFactory {
             String instrument = "";
             for (Instrument intru : instruments) {
                 InstrumentModel model = intru.getModel();
-                if (model != null)
-                    instrument += model.getName() + Constants.COMMA;
+                if (model != null) {
+                    String value = model.getValue();
+                    instrument += (value  == null ? model.getName() : value) + Constants.COMMA;
+                }
             }
 
             if (instrument.length() > 1)

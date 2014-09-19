@@ -6,6 +6,8 @@ package uk.ac.ebi.pride.tools.cluster.utils;
  */
 public class Constants {
     public static final String PRIDE_MZTAB_SUFFIX = ".pride.mztab";
+    public static final String PRIDE_MZTAB_SUFFIX_GZIPPED = ".pride.mztab.gz";
+    public static final String PRIDE_MGF_SUFFIX_GZIPPED = ".pride.mgf.gz";
     public static final String PRIDE_MGF_SUFFIX = ".pride.mgf";
     public static final String MGF_SUFFIX = ".mgf";
     public static final String INTERNAL_DIRECTORY = "internal";
