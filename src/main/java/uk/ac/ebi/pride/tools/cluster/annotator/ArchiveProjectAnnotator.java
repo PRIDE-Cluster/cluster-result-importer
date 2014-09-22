@@ -142,6 +142,13 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         }
     }
 
+    /**
+     * Load all the spectra of a given MGF file along with the related PSMs
+     * @param assaySummary  assay summary
+     * @param mzTabIndexer  mzTab object
+     * @param mgfFile   MGF file to load
+     * @throws IOException
+     */
     private void loadMetaDataByMgf(AssaySummary assaySummary, MzTabIndexer mzTabIndexer, File mgfFile) throws IOException {
         Long assaySummaryId = assaySummary.getId();
         String assayAccession = assaySummary.getAccession();
