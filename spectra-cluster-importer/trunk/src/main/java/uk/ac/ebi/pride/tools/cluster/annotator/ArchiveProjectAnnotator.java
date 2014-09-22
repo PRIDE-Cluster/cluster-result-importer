@@ -67,11 +67,11 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         Project project = projectRepository.findByAccession(projectAccession);
 
         // check whether project is already public
-//        if (!project.isPublicProject()) {
-//            String msg = "Project must be public: " + project.getAccession();
-//            logger.error(msg);
-//            throw new IllegalStateException(msg);
-//        }
+        if (!project.isPublicProject()) {
+            String msg = "Project must be public: " + project.getAccession();
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
 
         // project file path
         String projectFilePath = getFilePath(archiveFileRootPath, project);
