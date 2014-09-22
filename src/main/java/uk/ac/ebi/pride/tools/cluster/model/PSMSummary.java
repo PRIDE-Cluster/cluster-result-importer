@@ -16,8 +16,8 @@ public class PSMSummary {
     private String proteinAccession;
     private String proteinGroup;
     private String proteinName;
-    private int startPosition;
-    private int stopPosition;
+    private int startPosition = -1;
+    private int stopPosition = -1;
     private String preAminoAcid;
     private String postAminoAcid;
     private float deltaMZ;
