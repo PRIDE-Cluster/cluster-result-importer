@@ -115,11 +115,6 @@
             <artifactId>logback-core</artifactId>
             <version>${logback-core.version}</version>
         </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback-core.version}</version>
-        </dependency>
 
         <!-- jmzTab -->
         <dependency>
