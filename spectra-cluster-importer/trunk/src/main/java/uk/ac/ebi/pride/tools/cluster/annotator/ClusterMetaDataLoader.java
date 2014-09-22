@@ -1,5 +1,7 @@
 package uk.ac.ebi.pride.tools.cluster.annotator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -25,6 +27,9 @@ import java.util.List;
  * @version $Id$
  */
 public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClusterMetaDataLoader.class);
+
     public static final int MAX_INCREMENT_INT = 1000;
     public static final double MAX_INCREMENT_DOUBLE = 1000.0;
 
@@ -45,6 +50,7 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     @Override
     public void saveAssay(AssaySummary assay) {
+        logger.debug("Insert assay summary into database: {}", assay.getAccession());
         DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
         TransactionStatus transaction = transactionManager.getTransaction(transactionDefinition);
 
@@ -96,6 +102,8 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     @Override
     public void deleteAssayByProjectAccession(final String projectAccession) {
+        logger.debug("Delete project from database: {}", projectAccession);
+
         DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
         TransactionStatus transaction = transactionManager.getTransaction(transactionDefinition);
 
@@ -122,6 +130,8 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     @Override
     public void saveSpectra(final List<SpectrumSummary> spectra) {
+        logger.debug("Insert a list of spectra into database: {}", spectra.size());
+
         if (spectra.size() == 0)
             return;
 
@@ -190,6 +200,7 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     @Override
     public void saveSpectrum(SpectrumSummary spectrum) {
+        logger.debug("Insert a spectrum into database: {}", spectrum.getReferenceId());
 
         DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
         TransactionStatus transaction = transactionManager.getTransaction(transactionDefinition);
@@ -219,6 +230,8 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     @Override
     public void savePSMs(List<PSMSummary> psms) {
+        logger.debug("Insert a list of PSMs into database: {}", psms.size());
+
         if (psms.size() == 0)
             return;
 
@@ -246,10 +259,10 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
     }
 
     private void savePSMsWithPrimaryKey(final List<PSMSummary> psms) {
-        String INSERT_QUERY = "INSERT INTO psm (psm_pk, spectrum_fk, assay_fk, archive_psm_id, sequence, modifications, " +
+        String INSERT_QUERY = "INSERT INTO psm (psm_pk, spectrum_fk, assay_fk, archive_psm_id, sequence, modifications, search_engine, " +
                 "search_engine_scores, search_database, protein_accession, protein_group, protein_name, start_position, " +
                 "stop_position, pre_amino_acid, post_amino_acid, delta_mz, quantification_label) VALUES " +
-                "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         template.batchUpdate(INSERT_QUERY, new BatchPreparedStatementSetter() {
             @Override
@@ -261,17 +274,18 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
                 ps.setString(4, psm.getArchivePSMId());
                 ps.setString(5, psm.getSequence());
                 ps.setString(6, psm.getModifications());
-                ps.setString(7, psm.getSearchEngineScores());
-                ps.setString(8, psm.getSearchDatabase());
-                ps.setString(9, psm.getProteinAccession());
-                ps.setString(10, psm.getProteinGroup());
-                ps.setString(11, psm.getProteinName());
-                ps.setInt(12, psm.getStartPosition());
-                ps.setInt(13, psm.getStopPosition());
-                ps.setString(14, psm.getPreAminoAcid());
-                ps.setString(15, psm.getPostAminoAcid());
-                ps.setFloat(16, psm.getDeltaMZ());
-                ps.setString(17, psm.getQuantificationLabel());
+                ps.setString(7, psm.getSearchEngine());
+                ps.setString(8, psm.getSearchEngineScores());
+                ps.setString(9, psm.getSearchDatabase());
+                ps.setString(10, psm.getProteinAccession());
+                ps.setString(11, psm.getProteinGroup());
+                ps.setString(12, psm.getProteinName());
+                ps.setInt(13, psm.getStartPosition());
+                ps.setInt(14, psm.getStopPosition());
+                ps.setString(15, psm.getPreAminoAcid());
+                ps.setString(16, psm.getPostAminoAcid());
+                ps.setFloat(17, psm.getDeltaMZ());
+                ps.setString(18, psm.getQuantificationLabel());
             }
 
             @Override
@@ -284,6 +298,7 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     @Override
     public void savePSM(PSMSummary psm) {
+        logger.debug("Insert a PSM into database: {}", psm.getArchivePSMId());
 
         DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
         TransactionStatus transaction = transactionManager.getTransaction(transactionDefinition);
@@ -301,6 +316,9 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
             if (psm.getModifications() != null)
                 parameters.put("modifications", psm.getModifications());
+
+            if (psm.getSearchEngine() != null)
+                parameters.put("search_engine", psm.getSearchEngine());
 
             if (psm.getSearchEngineScores() != null)
                 parameters.put("search_engine_scores", psm.getSearchEngineScores());

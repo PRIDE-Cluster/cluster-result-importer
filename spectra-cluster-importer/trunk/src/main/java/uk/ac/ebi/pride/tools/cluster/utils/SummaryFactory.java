@@ -9,6 +9,7 @@ import uk.ac.ebi.pride.archive.repo.project.Project;
 import uk.ac.ebi.pride.archive.repo.project.ProjectTag;
 import uk.ac.ebi.pride.jmztab.model.Modification;
 import uk.ac.ebi.pride.jmztab.model.PSM;
+import uk.ac.ebi.pride.jmztab.model.Param;
 import uk.ac.ebi.pride.jmztab.model.SplitList;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
@@ -145,6 +146,17 @@ public final class SummaryFactory {
         SplitList<Modification> modifications = psm.getModifications();
         if (modifications != null && !modifications.isEmpty())
             psmSummary.setModifications(modifications.toString());
+
+        // search engine
+        String searchEngine = "";
+        SplitList<Param> searchEngines = psm.getSearchEngine();
+        if (searchEngines != null) {
+            for (Param param : searchEngines) {
+                searchEngine += param.getName() + Constants.COMMA;
+            }
+        }
+        if (searchEngine .length() > 1)
+            psmSummary.setSearchEngine(searchEngine.substring(0, searchEngine.length() - 1));
 
         //search engine scores
         String searchEngineScores = "";
