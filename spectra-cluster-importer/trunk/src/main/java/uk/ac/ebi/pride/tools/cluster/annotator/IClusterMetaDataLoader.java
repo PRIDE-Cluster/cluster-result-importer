@@ -4,7 +4,7 @@ import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -17,11 +17,13 @@ public interface IClusterMetaDataLoader {
 
     void saveAssay(AssaySummary assay);
 
-    void saveSpectra(Collection<SpectrumSummary> spectra);
+    void deleteAssayByProjectAccession(String projectAccession);
+
+    void saveSpectra(List<SpectrumSummary> spectra);
 
     void saveSpectrum(SpectrumSummary spectrum);
 
-    void savePSMs(Collection<PSMSummary> psms);
+    void savePSMs(List<PSMSummary> psms);
 
     void savePSM(PSMSummary psm);
 }

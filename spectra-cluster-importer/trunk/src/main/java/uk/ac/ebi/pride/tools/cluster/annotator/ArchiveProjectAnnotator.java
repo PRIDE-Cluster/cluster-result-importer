@@ -2,9 +2,6 @@ package uk.ac.ebi.pride.tools.cluster.annotator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
 import uk.ac.ebi.pride.archive.repo.assay.Assay;
 import uk.ac.ebi.pride.archive.repo.assay.AssayRepository;
@@ -26,10 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Add annotation for a particular project
@@ -73,11 +67,11 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         Project project = projectRepository.findByAccession(projectAccession);
 
         // check whether project is already public
-        if (!project.isPublicProject()) {
-            String msg = "Project must be public: " + project.getAccession();
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
+//        if (!project.isPublicProject()) {
+//            String msg = "Project must be public: " + project.getAccession();
+//            logger.error(msg);
+//            throw new IllegalStateException(msg);
+//        }
 
         // project file path
         String projectFilePath = getFilePath(archiveFileRootPath, project);
@@ -130,10 +124,10 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
     /**
      * Load all the metadata into data store
      *
-     * @param project  project object
-     * @param assay    assasy object
-     * @param mzTabFile    mzTab file
-     * @param mgfFiles a list of mgf files
+     * @param project   project object
+     * @param assay     assasy object
+     * @param mzTabFile mzTab file
+     * @param mgfFiles  a list of mgf files
      */
     private void loadMetaDataByMgfs(Project project, Assay assay, File mzTabFile, List<File> mgfFiles) throws IOException {
         MzTabIndexer mzTabIndexer = new MzTabIndexer(mzTabFile);
@@ -158,27 +152,91 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         LineNumberReader rdr = null;
         try {
             rdr = new LineNumberReader(new FileReader(mgfFile));
+            Map<SpectrumSummary, List<PSMSummary>> spectrumSummaryBuffer = new HashMap<SpectrumSummary, List<PSMSummary>>();
             ISpectrum spectrum;
             while ((spectrum = ParserUtilities.readMGFScan(rdr)) != null) {
                 if (spectrum.getPrecursorCharge() > 0 && spectrum.getPrecursorMz() > 0) {
                     Set<PSM> psms = getPSM(spectrum.getId(), mzTabIndexer);
 
                     if (!psms.isEmpty()) {
-                        SpectrumSummary spectrumSummary = SummaryFactory.summariseSpectrum(spectrum, assaySummaryId, true);
-                        clusterMetaDataLoader.saveSpectrum(spectrumSummary);
-                        for (PSM psm : psms) {
-                            PSMSummary psmSummary = SummaryFactory.summarisePSM(psm, projectAccession, assaySummaryId,
-                                                                    assayAccession, spectrumSummary.getId(), numberOfMsRuns);
-                            clusterMetaDataLoader.savePSM(psmSummary);
+                        if (spectrumSummaryBuffer.size() == 1000) {
+                            storeSpectrumAndPSM(spectrumSummaryBuffer);
+                            spectrumSummaryBuffer.clear();
                         }
+
+                        SpectrumSummary spectrumSummary = SummaryFactory.summariseSpectrum(spectrum, assaySummaryId, true);
+                        List<PSMSummary> psmSummaries = new ArrayList<PSMSummary>();
+                        for (PSM psm : psms) {
+                            PSMSummary psmSummary = SummaryFactory.summarisePSM(psm, projectAccession, assaySummaryId, assayAccession, numberOfMsRuns);
+                            psmSummaries.add(psmSummary);
+                        }
+                        spectrumSummaryBuffer.put(spectrumSummary, psmSummaries);
                     }
                 }
             }
+
+            storeSpectrumAndPSM(spectrumSummaryBuffer);
+            spectrumSummaryBuffer.clear();
         } finally {
             if (rdr != null)
                 rdr.close();
         }
     }
+
+    private void storeSpectrumAndPSM(Map<SpectrumSummary, List<PSMSummary>> spectrumSummaryBuffer) {
+        clusterMetaDataLoader.saveSpectra(new ArrayList<SpectrumSummary>(spectrumSummaryBuffer.keySet()));
+
+        List<PSMSummary> psmSummaries = new ArrayList<PSMSummary>();
+        for (Map.Entry<SpectrumSummary, List<PSMSummary>> spectrumSummaryListEntry : spectrumSummaryBuffer.entrySet()) {
+            SpectrumSummary spectrum = spectrumSummaryListEntry.getKey();
+            List<PSMSummary> psms = spectrumSummaryListEntry.getValue();
+            for (PSMSummary psm : psms) {
+                psm.setSpectrumId(spectrum.getId());
+            }
+            psmSummaries.addAll(psms);
+        }
+
+        clusterMetaDataLoader.savePSMs(psmSummaries);
+    }
+
+
+    /**
+     * This implementation insert a single record a time into the data store
+     * @param spectrumId
+     * @param mzTabIndexer
+     * @return
+     */
+//    private void loadMetaDataByMgf(AssaySummary assaySummary, MzTabIndexer mzTabIndexer, File mgfFile) throws IOException {
+//        Long assaySummaryId = assaySummary.getId();
+//        String assayAccession = assaySummary.getAccession();
+//        String projectAccession = assaySummary.getProjectAccession();
+//        int numberOfMsRuns = mzTabIndexer.getNumberOfMsRuns();
+//
+//        // load identified spectra in batch
+//        LineNumberReader rdr = null;
+//        try {
+//            rdr = new LineNumberReader(new FileReader(mgfFile));
+//            ISpectrum spectrum;
+//            while ((spectrum = ParserUtilities.readMGFScan(rdr)) != null) {
+//                if (spectrum.getPrecursorCharge() > 0 && spectrum.getPrecursorMz() > 0) {
+//                    Set<PSM> psms = getPSM(spectrum.getId(), mzTabIndexer);
+//
+//                    if (!psms.isEmpty()) {
+//                        SpectrumSummary spectrumSummary = SummaryFactory.summariseSpectrum(spectrum, assaySummaryId, true);
+//                        clusterMetaDataLoader.saveSpectrum(spectrumSummary);
+//                        for (PSM psm : psms) {
+//                            PSMSummary psmSummary = SummaryFactory.summarisePSM(psm, projectAccession, assaySummaryId,
+//                                                                    assayAccession, spectrumSummary.getId(), numberOfMsRuns);
+//                            clusterMetaDataLoader.savePSM(psmSummary);
+//                        }
+//                    }
+//                }
+//            }
+//        } finally {
+//            if (rdr != null)
+//                rdr.close();
+//        }
+//    }
 
     protected Set<PSM> getPSM(String spectrumId, MzTabIndexer mzTabIndexer) {
         String[] parts = spectrumId.split(";");
@@ -201,18 +259,22 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
      * Construct project file path
      *
      * @param rootPath      root path to all the projects
-     * @param publicProject project object
+     * @param project project object
      * @return file path to project files
      */
-    private String getFilePath(String rootPath, Project publicProject) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(publicProject.getPublicationDate());
-        int month = calendar.get(Calendar.MONTH) + 1;
+    private String getFilePath(String rootPath, Project project) {
+        if (project.isPublicProject()) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(project.getPublicationDate());
+            int month = calendar.get(Calendar.MONTH) + 1;
 
-        return rootPath
-                + File.separator + calendar.get(Calendar.YEAR)
-                + File.separator + (month < 10 ? "0" : "") + month
-                + File.separator + publicProject.getAccession();
+            return rootPath
+                    + File.separator + calendar.get(Calendar.YEAR)
+                    + File.separator + (month < 10 ? "0" : "") + month
+                    + File.separator + project.getAccession();
+        } else {
+            return rootPath + File.separator + project.getAccession();
+        }
     }
 
     /**
@@ -267,22 +329,18 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         // create connection to databases
         ArchiveRepositoryBuilder archiveRepositoryBuilder = new ArchiveRepositoryBuilder("prop/archive-database-oracle.properties");
         ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
-        ClusterMetaDataLoader metaDataLoader = new ClusterMetaDataLoader(clusterRepositoryBuilder.getDataSource());
+        ClusterMetaDataLoader metaDataLoader = new ClusterMetaDataLoader(clusterRepositoryBuilder.getTransactionManager());
 
         // create project annotator
         ArchiveProjectAnnotator annotator = new ArchiveProjectAnnotator(archiveRepositoryBuilder, metaDataLoader, archiveRootFilePath);
 
         // define transaction
-        DataSourceTransactionManager transactionManager = clusterRepositoryBuilder.getTransactionManager();
-        DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-        TransactionStatus transaction = transactionManager.getTransaction(transactionDefinition);
         try {
             annotator.annotate(projectAccession);
-
-            // commit transaction
-            transactionManager.commit(transaction);
         } catch (Exception ex) {
-            transactionManager.rollback(transaction);
+            // delete persisted records if there is an exception
+            metaDataLoader.deleteAssayByProjectAccession(projectAccession);
+
             String message = "Error loading project metadata into PRIDE cluster: " + projectAccession;
             throw new IllegalStateException(message, ex);
         }
