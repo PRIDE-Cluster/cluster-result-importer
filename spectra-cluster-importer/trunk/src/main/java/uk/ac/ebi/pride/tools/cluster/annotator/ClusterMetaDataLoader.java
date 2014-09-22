@@ -174,11 +174,15 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
 
     private long incrementPrimaryKeys(DataFieldMaxValueIncrementer incrementer, int size) {
         long maxKey = incrementer.nextLongValue();
-        long startingKey = maxKey - MAX_INCREMENT_INT + 1;
+        if (maxKey < MAX_INCREMENT_INT) {
+            maxKey = incrementer.nextLongValue();
+        }
+
+        long startingKey = maxKey - MAX_INCREMENT_INT;
         double cells = Math.ceil(size / MAX_INCREMENT_DOUBLE) - 1;
 
         for (int i = 0; i < cells; i++) {
-            incrementer.nextLongValue();
+            maxKey = incrementer.nextLongValue();
         }
 
         return startingKey;
