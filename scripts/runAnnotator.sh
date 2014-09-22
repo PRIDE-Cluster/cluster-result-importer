@@ -13,7 +13,7 @@ JOB_NAME="PRIDE-CLUSTER-ANNOTATION"
 # memory limit
 MEMORY_LIMIT=15000
 # LSF email notification
-JOB_EMAIL="${pride.report.email}"
+JOB_EMAIL="rwang@ebi.ac.uk"
 
 
 ##### RUN it on the production LSF cluster #####
