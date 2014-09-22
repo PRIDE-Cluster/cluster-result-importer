@@ -61,7 +61,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
 
     @Override
     public void annotate(String projectAccession) {
-        logger.info("Trying to annotation project {}", projectAccession);
+        logger.info("Trying to annotation project: {}", projectAccession);
 
         ProjectRepository projectRepository = archiveRepositoryBuilder.getProjectRepository();
         Project project = projectRepository.findByAccession(projectAccession);
@@ -84,7 +84,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
             loadMetaDataByAssay(project, projectFilePath, assay);
         }
 
-        logger.info("Project annotation has finished {}", projectAccession);
+        logger.info("Project annotation has finished: {}", projectAccession);
     }
 
     /**
@@ -107,7 +107,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
             List<File> mgfFiles = findMgfFiles(projectFilePath, assayFiles);
 
             if (mgfFiles != null && !mgfFiles.isEmpty()) {
-                logger.info("Found {} number of MGF files", mgfFiles.size());
+                logger.info("Found {} MGF files", mgfFiles.size());
 
                 // parse mztab object
                 try {

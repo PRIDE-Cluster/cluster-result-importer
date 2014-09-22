@@ -1,10 +1,8 @@
 package uk.ac.ebi.pride.tools.cluster.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -21,11 +19,10 @@ public class PropertyUtils {
      */
     public static Properties loadProperties(String resourceUrl) throws URISyntaxException, IOException {
         ClassLoader classLoader = PropertyUtils.class.getClassLoader();
-        URL resource = classLoader.getResource(resourceUrl);
-        File file = new File(resource.toURI());
+        InputStream inputStream = classLoader.getResourceAsStream(resourceUrl);
 
         Properties properties = new Properties();
-        properties.load(new FileInputStream(file));
+        properties.load(inputStream);
 
         return properties;
     }
