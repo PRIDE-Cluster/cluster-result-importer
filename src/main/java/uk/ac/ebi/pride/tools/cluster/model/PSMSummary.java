@@ -11,6 +11,7 @@ public class PSMSummary {
     private String archivePSMId;
     private String sequence;
     private String modifications;
+    private String searchEngine;
     private String searchEngineScores;
     private String searchDatabase;
     private String proteinAccession;
@@ -69,6 +70,14 @@ public class PSMSummary {
 
     public void setModifications(String modifications) {
         this.modifications = modifications;
+    }
+
+    public String getSearchEngine() {
+        return searchEngine;
+    }
+
+    public void setSearchEngine(String searchEngine) {
+        this.searchEngine = searchEngine;
     }
 
     public String getSearchEngineScores() {

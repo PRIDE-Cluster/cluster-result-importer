@@ -1,19 +1,15 @@
 #!/bin/sh
 
 ##### OPTIONS
-# (required)  the submission ticket number
-TICKET=""
-# (optional)  a time stamp in the format: yyy-mm-dd
-DATE=""
-# (optional)  skip raw/peak zip file extraction
-SKIP=""
+# (required)  root path to PRIDE Archive production file syste
+ARCHIVE_ROOT_FILE_PATH=$1
+# (required)  PRIDE Archive project accession
+PROJECT_ACCESSION=$2
 
 
 ##### VARIABLES
 # the name to give to the LSF job (to be extended with additional info)
-JOB_NAME="validation"
-# the job parameters that are going to be passed on to the job (build below)
-JOB_PARAMETERS=""
+JOB_NAME="PRIDE-CLUSTER-ANNOTATION"
 # memory limit
 MEMORY_LIMIT=15000
 # LSF email notification
