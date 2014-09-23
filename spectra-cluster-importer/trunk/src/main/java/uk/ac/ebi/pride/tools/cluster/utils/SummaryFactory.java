@@ -11,20 +11,25 @@ import uk.ac.ebi.pride.jmztab.model.Modification;
 import uk.ac.ebi.pride.jmztab.model.PSM;
 import uk.ac.ebi.pride.jmztab.model.Param;
 import uk.ac.ebi.pride.jmztab.model.SplitList;
+import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
+import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
+import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Rui Wang
  * @version $Id$
  */
 public final class SummaryFactory {
-
-
 
     public static AssaySummary summariseAssay(Project project, Assay assay) {
         AssaySummary assaySummary = new AssaySummary();
@@ -218,9 +223,6 @@ public final class SummaryFactory {
     }
 
 
-
-
-
     public static SpectrumSummary summariseSpectrum(ISpectrum spectrum, Long assayId, boolean identified) {
         SpectrumSummary spectrumSummary = new SpectrumSummary();
 
@@ -231,5 +233,48 @@ public final class SummaryFactory {
         spectrumSummary.setIdentified(identified);
 
         return spectrumSummary;
+    }
+
+
+    public static ClusterSummary summariseCluster(ICluster cluster) throws IOException {
+        ClusterSummary clusterSummary = new ClusterSummary();
+
+        clusterSummary.setAveragePrecursorMz(cluster.getAvPrecursorMz());
+
+        float averagePrecursorCharge = calculateAveragePrecursorCharge(cluster);
+        clusterSummary.setAveragePrecursorCharge(averagePrecursorCharge);
+
+        List<Float> consensusMzValues = cluster.getConsensusMzValues();
+        clusterSummary.setConsensusSpectrumMz(convertToByteArray(consensusMzValues));
+
+        List<Float> consensusIntensValues = cluster.getConsensusIntensValues();
+        clusterSummary.setConsensusSpectrumIntensity(convertToByteArray(consensusIntensValues));
+
+        clusterSummary.setNumberOfSpectra(cluster.getSpecCount());
+
+        clusterSummary.setMaxPeptideRatio(cluster.getMaxRatio());
+
+
+
+        return clusterSummary;
+    }
+
+    private static float calculateAveragePrecursorCharge(ICluster cluster) {
+        List<ISpectrumReference> spectrumReferences = cluster.getSpectrumReferences();
+        int chargeSum = 0;
+        for (ISpectrumReference spectrumReference : spectrumReferences) {
+            int charge = spectrumReference.getCharge();
+            if (charge <= 0)
+                return 0;
+            chargeSum += charge;
+        }
+        return chargeSum/spectrumReferences.size();
+    }
+
+    private static byte[] convertToByteArray(Collection<Float> content) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(content);
+        return bos.toByteArray();
     }
 }

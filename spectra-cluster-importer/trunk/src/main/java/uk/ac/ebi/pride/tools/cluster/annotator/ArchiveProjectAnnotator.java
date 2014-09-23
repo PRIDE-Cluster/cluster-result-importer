@@ -16,6 +16,8 @@ import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
+import uk.ac.ebi.pride.tools.cluster.repo.ClusterDao;
+import uk.ac.ebi.pride.tools.cluster.repo.IClusterDao;
 import uk.ac.ebi.pride.tools.cluster.utils.Constants;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
 
@@ -48,11 +50,11 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
     public static final Logger logger = LoggerFactory.getLogger(ArchiveProjectAnnotator.class);
 
     private final ArchiveRepositoryBuilder archiveRepositoryBuilder;
-    private final IClusterMetaDataLoader clusterMetaDataLoader;
+    private final IClusterDao clusterMetaDataLoader;
     private final String archiveFileRootPath;
 
     public ArchiveProjectAnnotator(ArchiveRepositoryBuilder archiveRepositoryBuilder,
-                                   IClusterMetaDataLoader clusterMetaDataLoader,
+                                   IClusterDao clusterMetaDataLoader,
                                    String archiveFileRootPath) {
         this.archiveRepositoryBuilder = archiveRepositoryBuilder;
         this.clusterMetaDataLoader = clusterMetaDataLoader;
@@ -166,7 +168,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
                     Set<PSM> psms = getPSM(spectrum.getId(), mzTabIndexer);
 
                     if (!psms.isEmpty()) {
-                        if (spectrumSummaryBuffer.size() == 1000) {
+                        if (spectrumSummaryBuffer.size() == 5000) {
                             storeSpectrumAndPSM(spectrumSummaryBuffer);
                             spectrumSummaryBuffer.clear();
                         }
@@ -197,10 +199,11 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         for (Map.Entry<SpectrumSummary, List<PSMSummary>> spectrumSummaryListEntry : spectrumSummaryBuffer.entrySet()) {
             SpectrumSummary spectrum = spectrumSummaryListEntry.getKey();
             List<PSMSummary> psms = spectrumSummaryListEntry.getValue();
+
             for (PSMSummary psm : psms) {
                 psm.setSpectrumId(spectrum.getId());
+                psmSummaries.add(psm);
             }
-            psmSummaries.addAll(psms);
         }
 
         clusterMetaDataLoader.savePSMs(psmSummaries);
@@ -336,7 +339,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         // create connection to databases
         ArchiveRepositoryBuilder archiveRepositoryBuilder = new ArchiveRepositoryBuilder("prop/archive-database-oracle.properties");
         ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
-        ClusterMetaDataLoader metaDataLoader = new ClusterMetaDataLoader(clusterRepositoryBuilder.getTransactionManager());
+        ClusterDao metaDataLoader = new ClusterDao(clusterRepositoryBuilder.getTransactionManager());
 
         // create project annotator
         ArchiveProjectAnnotator annotator = new ArchiveProjectAnnotator(archiveRepositoryBuilder, metaDataLoader, archiveRootFilePath);
