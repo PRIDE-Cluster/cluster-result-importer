@@ -40,7 +40,7 @@
         <oracle-thin.version>11.2.0.1.0</oracle-thin.version>
         <archive-repo.version>0.1.17-SNAPSHOT</archive-repo.version>
         <jmztab.version>3.0.0</jmztab.version>
-        <spectra-cluster.version>1.0.3-SNAPSHOT</spectra-cluster.version>
+        <spectra-cluster.version>1.0.5-SNAPSHOT</spectra-cluster.version>
     </properties>
 
 	<build>
@@ -113,6 +113,11 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
+            <version>${logback-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
             <version>${logback-core.version}</version>
         </dependency>
 

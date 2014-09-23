@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.tools.cluster.annotator;
 
+import org.apache.commons.io.FilenameUtils;
 import uk.ac.ebi.pride.jmztab.model.*;
 import uk.ac.ebi.pride.jmztab.utils.MZTabFileParser;
 import uk.ac.ebi.pride.jmztab.utils.errors.MZTabErrorList;
@@ -44,7 +45,7 @@ public class MzTabIndexer {
         SortedMap<Integer, MsRun> msRunMap = mzTab.getMetadata().getMsRunMap();
         for (MsRun msRun : msRunMap.values()) {
             String msRunFile = msRun.getLocation().getFile();
-            String msRunFileName = new File(msRunFile).getName();
+            String msRunFileName = FilenameUtils.getName(msRunFile);
             fileToMsRun.put(msRunFileName, msRun);
         }
 
