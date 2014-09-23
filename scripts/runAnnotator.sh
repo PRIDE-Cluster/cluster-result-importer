@@ -9,7 +9,7 @@ PROJECT_ACCESSION=$2
 
 ##### VARIABLES
 # the name to give to the LSF job (to be extended with additional info)
-JOB_NAME="PRIDE-CLUSTER-ANNOTATION-${PROJECT_ACCESSION}"
+JOB_NAME="PRIDE-CLUSTER-ANNOTATION-${PROJECT_ACCESSION}C"
 # memory limit in MGb
 MEMORY_LIMIT=10000
 # LSF email notification

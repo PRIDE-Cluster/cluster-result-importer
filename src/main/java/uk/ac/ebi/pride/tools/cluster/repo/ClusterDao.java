@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.tools.cluster.annotator;
+package uk.ac.ebi.pride.tools.cluster.repo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +15,10 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.ebi.pride.tools.cluster.importer.ClusterImportException;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
+import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
+import uk.ac.ebi.pride.tools.cluster.utils.CollectionUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -27,12 +29,11 @@ import java.util.List;
  * @author Rui Wang
  * @version $Id$
  */
-public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
+public class ClusterDao implements IClusterDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClusterMetaDataLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClusterDao.class);
 
-    public static final int MAX_INCREMENT_INT = 1000;
-    public static final double MAX_INCREMENT_DOUBLE = 1000.0;
+    public static final int MAX_INCREMENT = 1000;
 
     private final JdbcTemplate template;
     private final TransactionTemplate transactionTemplate;
@@ -40,7 +41,7 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
     private final DataFieldMaxValueIncrementer psmPrimaryKeyIncrementer;
     private final DataFieldMaxValueIncrementer clusterPrimaryKeyIncrementer;
 
-    public ClusterMetaDataLoader(DataSourceTransactionManager transactionManager) {
+    public ClusterDao(DataSourceTransactionManager transactionManager) {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.template = new JdbcTemplate(transactionManager.getDataSource());
         this.spectrumPrimaryKeyIncrementer = new OracleSequenceMaxValueIncrementer(template.getDataSource(), "spectrum_pk_sequence");
@@ -138,12 +139,23 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
         if (spectra.size() == 0)
             return;
 
+        List<List<SpectrumSummary>> chunks = CollectionUtils.chunks(spectra, MAX_INCREMENT);
+
+        for (List<SpectrumSummary> chunk : chunks) {
+            saveBatchOfSpectra(chunk);
+        }
+    }
+
+    private void saveBatchOfSpectra(final List<SpectrumSummary> spectra) {
+        if (spectra.size() > MAX_INCREMENT)
+            throw new IllegalStateException("The number of spectra cannot excceed: " + MAX_INCREMENT);
+
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 try {
-                    final long startingKey = incrementPrimaryKeys(spectrumPrimaryKeyIncrementer, spectra.size());
+                    final long startingKey = spectrumPrimaryKeyIncrementer.nextLongValue();
 
                     // add primary key
                     int count = 0;
@@ -161,8 +173,6 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
                 }
             }
         });
-
-
     }
 
     private void saveSpectraWithPrimaryKey(final List<SpectrumSummary> spectra) {
@@ -187,24 +197,6 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
                 return spectra.size();
             }
         });
-    }
-
-
-    private long incrementPrimaryKeys(final DataFieldMaxValueIncrementer incrementer, final int size) {
-        long maxKey = incrementer.nextLongValue();
-        if (maxKey < MAX_INCREMENT_INT) {
-            maxKey = incrementer.nextLongValue();
-        }
-
-        long startingKey = maxKey - MAX_INCREMENT_INT;
-        // ensure extra space between different id requests
-        double cells = Math.ceil(size / MAX_INCREMENT_DOUBLE);
-
-        for (int i = 0; i < cells; i++) {
-            maxKey = incrementer.nextLongValue();
-        }
-
-        return startingKey;
     }
 
     @Override
@@ -247,13 +239,23 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
         if (psms.size() == 0)
             return;
 
+        List<List<PSMSummary>> chunks = CollectionUtils.chunks(psms, MAX_INCREMENT);
+        for (List<PSMSummary> chunk : chunks) {
+            saveBatchOfPSMs(chunk);
+        }
+    }
+
+    private void saveBatchOfPSMs(final List<PSMSummary> psms) {
+        if (psms.size() > MAX_INCREMENT)
+            throw new IllegalStateException("The number of spectra cannot exceed: " + MAX_INCREMENT);
+
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 try {
 
-                    final long startingKey = incrementPrimaryKeys(psmPrimaryKeyIncrementer, psms.size());
+                    final long startingKey = psmPrimaryKeyIncrementer.nextLongValue();
 
                     // add primary key
                     int count = 0;
@@ -375,6 +377,16 @@ public class ClusterMetaDataLoader implements IClusterMetaDataLoader {
                 }
             }
         });
+    }
+
+    @Override
+    public void saveClusters(List<ClusterSummary> clusters) {
+        //todo: implement
+    }
+
+    @Override
+    public void saveCluster(ClusterSummary cluster) {
+        //todo: implement
     }
 
 
