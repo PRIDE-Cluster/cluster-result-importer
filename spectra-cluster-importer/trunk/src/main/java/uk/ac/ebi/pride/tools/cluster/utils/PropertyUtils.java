@@ -9,7 +9,7 @@ import java.util.Properties;
  * @author Rui Wang
  * @version $Id$
  */
-public class PropertyUtils {
+public final class PropertyUtils {
     /**
      * Load data source properties from property file
      *

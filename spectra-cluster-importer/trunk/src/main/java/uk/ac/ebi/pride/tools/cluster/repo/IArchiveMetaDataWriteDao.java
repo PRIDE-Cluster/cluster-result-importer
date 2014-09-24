@@ -1,7 +1,6 @@
 package uk.ac.ebi.pride.tools.cluster.repo;
 
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
-import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
 
@@ -27,8 +26,4 @@ public interface IArchiveMetaDataWriteDao {
     void savePSMs(List<PSMSummary> psms);
 
     void savePSM(PSMSummary psm);
-
-    void saveClusters(List<ClusterSummary> clusters);
-
-    void saveCluster(ClusterSummary cluster);
 }

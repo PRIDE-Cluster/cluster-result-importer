@@ -7,7 +7,7 @@ import java.util.List;
  * @author Rui Wang
  * @version $Id$
  */
-public class CollectionUtils {
+public final class CollectionUtils {
 
     /**
      * Split a big list into fix sized chunks
