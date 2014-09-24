@@ -1,9 +1,6 @@
 package uk.ac.ebi.pride.tools.cluster.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Rui Wang

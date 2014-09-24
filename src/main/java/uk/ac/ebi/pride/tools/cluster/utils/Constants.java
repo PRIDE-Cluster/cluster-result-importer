@@ -4,7 +4,7 @@ package uk.ac.ebi.pride.tools.cluster.utils;
  * @author Rui Wang
  * @version $Id$
  */
-public class Constants {
+public final class Constants {
     public static final String PRIDE_MZTAB_SUFFIX = ".pride.mztab";
     public static final String PRIDE_MZTAB_SUFFIX_GZIPPED = ".pride.mztab.gz";
     public static final String PRIDE_MGF_SUFFIX_GZIPPED = ".pride.mgf.gz";
