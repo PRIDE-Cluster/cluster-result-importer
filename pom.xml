@@ -38,9 +38,10 @@
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <spring-jdbc.version>3.2.9.RELEASE</spring-jdbc.version>
         <oracle-thin.version>11.2.0.1.0</oracle-thin.version>
-        <archive-repo.version>0.1.17-SNAPSHOT</archive-repo.version>
+        <archive-repo.version>0.1.19-SNAPSHOT</archive-repo.version>
         <jmztab.version>3.0.0</jmztab.version>
         <spectra-cluster.version>1.0.5-SNAPSHOT</spectra-cluster.version>
+        <archive-data-provider-api.version>2.0.5</archive-data-provider-api.version>
     </properties>
 
 	<build>
@@ -177,9 +178,17 @@
         <!-- archive repo -->
         <dependency>
             <groupId>uk.ac.ebi.pride.archive</groupId>
+            <artifactId>archive-data-provider-api</artifactId>
+            <version>${archive-data-provider-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.pride.archive</groupId>
             <artifactId>archive-repo</artifactId>
             <version>${archive-repo.version}</version>
         </dependency>
+
+
 
 	</dependencies>
 

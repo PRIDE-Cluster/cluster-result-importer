@@ -16,8 +16,8 @@ import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
-import uk.ac.ebi.pride.tools.cluster.repo.ClusterDao;
-import uk.ac.ebi.pride.tools.cluster.repo.IClusterDao;
+import uk.ac.ebi.pride.tools.cluster.repo.ArchiveMetaDataWriterDao;
+import uk.ac.ebi.pride.tools.cluster.repo.IArchiveMetaDataWriteDao;
 import uk.ac.ebi.pride.tools.cluster.utils.Constants;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
 
@@ -50,11 +50,11 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
     public static final Logger logger = LoggerFactory.getLogger(ArchiveProjectAnnotator.class);
 
     private final ArchiveRepositoryBuilder archiveRepositoryBuilder;
-    private final IClusterDao clusterMetaDataLoader;
+    private final IArchiveMetaDataWriteDao clusterMetaDataLoader;
     private final String archiveFileRootPath;
 
     public ArchiveProjectAnnotator(ArchiveRepositoryBuilder archiveRepositoryBuilder,
-                                   IClusterDao clusterMetaDataLoader,
+                                   IArchiveMetaDataWriteDao clusterMetaDataLoader,
                                    String archiveFileRootPath) {
         this.archiveRepositoryBuilder = archiveRepositoryBuilder;
         this.clusterMetaDataLoader = clusterMetaDataLoader;
@@ -167,7 +167,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
                 if (spectrum.getPrecursorCharge() > 0 && spectrum.getPrecursorMz() > 0) {
                     Set<PSM> psms = getPSM(spectrum.getId(), mzTabIndexer);
 
-                    if (!psms.isEmpty()) {
+                    if (psms != null && !psms.isEmpty()) {
                         if (spectrumSummaryBuffer.size() == 5000) {
                             storeSpectrumAndPSM(spectrumSummaryBuffer);
                             spectrumSummaryBuffer.clear();
@@ -256,13 +256,14 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         // get ms run
         MsRun msRun = mzTabIndexer.findMsRunUsingFileName(parts[1]);
         if (msRun == null) {
-            throw new IllegalStateException("Failed to find MS run for spectrum: " + spectrumId);
+            String message = "Failed to find MS run for spectrum: " + spectrumId;
+            logger.warn(message);
+            return null;
+        } else {
+            // spectrum id
+            String spectrumRef = msRun.getReference() + ":" + parts[2];
+            return mzTabIndexer.findPSMUsingSpectrumId(spectrumRef);
         }
-
-        // spectrum id
-        String spectrumRef = msRun.getReference() + ":" + parts[2];
-
-        return mzTabIndexer.findPSMUsingSpectrumId(spectrumRef);
     }
 
     /**
@@ -339,7 +340,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         // create connection to databases
         ArchiveRepositoryBuilder archiveRepositoryBuilder = new ArchiveRepositoryBuilder("prop/archive-database-oracle.properties");
         ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
-        ClusterDao metaDataLoader = new ClusterDao(clusterRepositoryBuilder.getTransactionManager());
+        ArchiveMetaDataWriterDao metaDataLoader = new ArchiveMetaDataWriterDao(clusterRepositoryBuilder.getTransactionManager());
 
         // create project annotator
         ArchiveProjectAnnotator annotator = new ArchiveProjectAnnotator(archiveRepositoryBuilder, metaDataLoader, archiveRootFilePath);

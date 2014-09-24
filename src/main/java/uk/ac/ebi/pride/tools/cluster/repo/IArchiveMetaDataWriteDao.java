@@ -14,7 +14,7 @@ import java.util.List;
  * @author Rui Wang
  * @version $Id$
  */
-public interface IClusterDao {
+public interface IArchiveMetaDataWriteDao {
 
     void saveAssay(AssaySummary assay);
 
