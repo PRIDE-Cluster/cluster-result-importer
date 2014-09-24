@@ -14,10 +14,7 @@ import uk.ac.ebi.pride.jmztab.model.SplitList;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
-import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
-import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
-import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
-import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
+import uk.ac.ebi.pride.tools.cluster.model.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -254,7 +251,12 @@ public final class SummaryFactory {
 
         clusterSummary.setMaxPeptideRatio(cluster.getMaxRatio());
 
-
+        for (ISpectrumReference spectrumReference : cluster.getSpectrumReferences()) {
+            ClusteredSpectrumSummary clusteredSpectrumSummary = new ClusteredSpectrumSummary();
+            clusteredSpectrumSummary.setReferenceId(spectrumReference.getSpectrumId());
+            clusteredSpectrumSummary.setSimilarityScore(spectrumReference.getSimilarityScore());
+            clusterSummary.addClusteredSpectrumSummary(clusteredSpectrumSummary);
+        }
 
         return clusterSummary;
     }
