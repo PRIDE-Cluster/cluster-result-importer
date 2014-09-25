@@ -13,7 +13,6 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import uk.ac.ebi.pride.tools.cluster.importer.ClusterImportException;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
