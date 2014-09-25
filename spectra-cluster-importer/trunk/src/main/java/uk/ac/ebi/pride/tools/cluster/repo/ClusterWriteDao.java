@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -13,7 +12,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import uk.ac.ebi.pride.tools.cluster.importer.ClusterImportException;
 import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredPSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredSpectrumSummary;
@@ -21,10 +19,10 @@ import uk.ac.ebi.pride.tools.cluster.utils.ClusterSummaryUtils;
 import uk.ac.ebi.pride.tools.cluster.utils.CollectionUtils;
 import uk.ac.ebi.pride.tools.cluster.utils.Constants;
 
-import java.io.ByteArrayInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,10 +93,14 @@ public class ClusterWriteDao implements IClusterWriteDao{
         parameters.put("avg_precursor_charge", cluster.getAveragePrecursorCharge());
         parameters.put("number_of_spectra", cluster.getNumberOfSpectra());
         parameters.put("max_ratio", cluster.getMaxPeptideRatio());
-        parameters.put("consensus_spectrum_mz", new ByteArrayInputStream(mzByteArray));
-        parameters.put("consensus_spectrum_mz", new ByteArrayInputStream(intensityByteArray));
+        parameters.put("consensus_spectrum_mz",mzByteArray);
+        parameters.put("consensus_spectrum_intensity", intensityByteArray);
 
-        Number key = simpleJdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource(parameters);
+        parameterSource.registerSqlType("consensus_spectrum_mz", Types.BINARY);
+        parameterSource.registerSqlType("consensus_spectrum_intensity", Types.BINARY);
+
+        Number key = simpleJdbcInsert.executeAndReturnKey(parameterSource);
         long clusterId = key.longValue();
         cluster.setId(clusterId);
 
@@ -111,16 +113,12 @@ public class ClusterWriteDao implements IClusterWriteDao{
 
     private void updateSpectrumIdForClusteredSpectra(final ClusterSummary cluster) {
         String SELECT_QUERY = "select spectrum.spectrum_pk, spectrum.spectrum_ref, psm.psm_pk, psm.sequence from spectrum " +
-                "join psm on (spectrum.spectrum_pk = psm.spectrum_fk) where spectrum.spectrum_ref in (?)";
+                "join psm on (spectrum.spectrum_pk = psm.spectrum_fk) where spectrum.spectrum_ref in ";
 
         List<String> queries = concatenateSpectrumReferencesForQuery(cluster.getClusteredSpectrumSummaries(), 100);
         for (final String query : queries) {
-            template.query(SELECT_QUERY, new PreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, query);
-                }
-            }, new RowCallbackHandler() {
+            String sql = SELECT_QUERY + "(" + query + ")";
+            template.query(sql, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     long spectrumPk = rs.getLong(1);
@@ -203,7 +201,7 @@ public class ClusterWriteDao implements IClusterWriteDao{
 
     private void saveClusteredPSMs(final List<ClusteredPSMSummary> clusteredPSMSummaries) {
         String INSERT_QUERY = "INSERT INTO cluster_has_psm (cluster_fk, psm_fk, ratio, rank) " +
-                              "VALUES (?, ?, ?)";
+                              "VALUES (?, ?, ?, ?)";
 
         template.batchUpdate(INSERT_QUERY, new BatchPreparedStatementSetter() {
             @Override

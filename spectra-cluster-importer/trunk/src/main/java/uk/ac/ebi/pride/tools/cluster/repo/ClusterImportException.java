@@ -1,13 +1,10 @@
-package uk.ac.ebi.pride.tools.cluster.importer;
+package uk.ac.ebi.pride.tools.cluster.repo;
 
 /**
- * Runtime exception will be thrown if there is a error while loading a cluster
- *
  * @author Rui Wang
  * @version $Id$
  */
-public class ClusterImportException extends RuntimeException{
-
+public class ClusterImportException extends RuntimeException {
     public ClusterImportException() {
     }
 
