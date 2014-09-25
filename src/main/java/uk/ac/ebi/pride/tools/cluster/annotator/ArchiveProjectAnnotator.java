@@ -1,8 +1,10 @@
 package uk.ac.ebi.pride.tools.cluster.annotator;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
+import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
 import uk.ac.ebi.pride.archive.repo.assay.Assay;
 import uk.ac.ebi.pride.archive.repo.assay.AssayRepository;
 import uk.ac.ebi.pride.archive.repo.file.ProjectFile;
@@ -105,20 +107,13 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         File mzTabFile = findMzTabFile(projectFilePath, assayFiles);
         if (mzTabFile != null) {
             logger.info("Found mzTab file: {}", mzTabFile.getAbsolutePath());
-
-            List<File> mgfFiles = findMgfFiles(projectFilePath, assayFiles);
-
-            if (mgfFiles != null && !mgfFiles.isEmpty()) {
-                logger.info("Found {} MGF files", mgfFiles.size());
-
-                // parse mztab object
-                try {
-                    loadMetaDataByMgfs(project, assay, mzTabFile, mgfFiles);
-                } catch (IOException e) {
-                    String msg = "Failed to read mzTab file: " + mzTabFile.getAbsolutePath();
-                    logger.error(msg);
-                    throw new IllegalStateException(msg, e);
-                }
+            // parse mztab object
+            try {
+                loadMetaDataByMgfs(project, assay, mzTabFile, projectFilePath);
+            } catch (IOException e) {
+                String msg = "Failed to read mzTab file: " + mzTabFile.getAbsolutePath();
+                logger.error(msg);
+                throw new IllegalStateException(msg, e);
             }
         }
     }
@@ -129,26 +124,32 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
      * @param project   project object
      * @param assay     assasy object
      * @param mzTabFile mzTab file
-     * @param mgfFiles  a list of mgf files
      */
-    private void loadMetaDataByMgfs(Project project, Assay assay, File mzTabFile, List<File> mgfFiles) throws IOException {
+    private void loadMetaDataByMgfs(Project project, Assay assay, File mzTabFile, String projectFilePath) throws IOException {
         MzTabIndexer mzTabIndexer = new MzTabIndexer(mzTabFile);
+
 
         AssaySummary assaySummary = SummaryFactory.summariseAssay(project, assay);
         clusterMetaDataLoader.saveAssay(assaySummary);
         logger.info("Assay summary annotated. Assay database id: {}", assaySummary.getId());
 
-        for (File mgfFile : mgfFiles) {
-            logger.info("loading mgf file {}", mgfFile.getAbsolutePath());
-            loadMetaDataByMgf(assaySummary, mzTabIndexer, mgfFile);
+        Set<String> msRunFileNames = mzTabIndexer.getMsRunFileNames();
+        for (String msRunFileName : msRunFileNames) {
+            String mgfFileName = FilenameUtils.removeExtension(msRunFileName) + Constants.PRIDE_MGF_SUFFIX;
+            File mgfFile = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + mgfFileName);
+            if (mgfFile.exists()) {
+                logger.info("loading mgf file {}", mgfFile.getAbsolutePath());
+                loadMetaDataByMgf(assaySummary, mzTabIndexer, mgfFile);
+            }
         }
     }
 
     /**
      * Load all the spectra of a given MGF file along with the related PSMs
-     * @param assaySummary  assay summary
-     * @param mzTabIndexer  mzTab object
-     * @param mgfFile   MGF file to load
+     *
+     * @param assaySummary assay summary
+     * @param mzTabIndexer mzTab object
+     * @param mgfFile      MGF file to load
      * @throws IOException
      */
     private void loadMetaDataByMgf(AssaySummary assaySummary, MzTabIndexer mzTabIndexer, File mgfFile) throws IOException {
@@ -211,45 +212,6 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         clusterMetaDataLoader.savePSMs(psmSummaries);
     }
 
-
-    /**
-     * This implementation insert a single record a time into the data store
-     * @param spectrumId
-     * @param mzTabIndexer
-     * @return
-     */
-//    private void loadMetaDataByMgf(AssaySummary assaySummary, MzTabIndexer mzTabIndexer, File mgfFile) throws IOException {
-//        Long assaySummaryId = assaySummary.getId();
-//        String assayAccession = assaySummary.getAccession();
-//        String projectAccession = assaySummary.getProjectAccession();
-//        int numberOfMsRuns = mzTabIndexer.getNumberOfMsRuns();
-//
-//        // load identified spectra in batch
-//        LineNumberReader rdr = null;
-//        try {
-//            rdr = new LineNumberReader(new FileReader(mgfFile));
-//            ISpectrum spectrum;
-//            while ((spectrum = ParserUtilities.readMGFScan(rdr)) != null) {
-//                if (spectrum.getPrecursorCharge() > 0 && spectrum.getPrecursorMz() > 0) {
-//                    Set<PSM> psms = getPSM(spectrum.getId(), mzTabIndexer);
-//
-//                    if (!psms.isEmpty()) {
-//                        SpectrumSummary spectrumSummary = SummaryFactory.summariseSpectrum(spectrum, assaySummaryId, true);
-//                        clusterMetaDataLoader.saveSpectrum(spectrumSummary);
-//                        for (PSM psm : psms) {
-//                            PSMSummary psmSummary = SummaryFactory.summarisePSM(psm, projectAccession, assaySummaryId,
-//                                                                    assayAccession, spectrumSummary.getId(), numberOfMsRuns);
-//                            clusterMetaDataLoader.savePSM(psmSummary);
-//                        }
-//                    }
-//                }
-//            }
-//        } finally {
-//            if (rdr != null)
-//                rdr.close();
-//        }
-//    }
-
     protected Set<PSM> getPSM(String spectrumId, MzTabIndexer mzTabIndexer) {
         String[] parts = spectrumId.split(";");
         if (parts.length < 3)
@@ -271,8 +233,8 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
     /**
      * Construct project file path
      *
-     * @param rootPath      root path to all the projects
-     * @param project project object
+     * @param rootPath root path to all the projects
+     * @param project  project object
      * @return file path to project files
      */
     private String getFilePath(String rootPath, Project project) {
@@ -298,40 +260,37 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
      * @return
      */
     private File findMzTabFile(String projectFilePath, List<ProjectFile> assayFiles) {
+        String resultFileName = null;
         for (ProjectFile assayFile : assayFiles) {
-            if (assayFile.getFileSource().equals(ProjectFileSource.GENERATED) &&
-                    assayFile.getFileName().endsWith(Constants.PRIDE_MZTAB_SUFFIX_GZIPPED)) {
-                String fileName = assayFile.getFileName().substring(0, assayFile.getFileName().length() - 3);
+            ProjectFileSource fileSource = assayFile.getFileSource();
+            String assayFileFileName = assayFile.getFileName();
+            ProjectFileType fileType = assayFile.getFileType();
+
+            if (fileSource.equals(ProjectFileSource.GENERATED) && assayFileFileName.endsWith(Constants.PRIDE_MZTAB_SUFFIX_GZIPPED)) {
+                String fileName = assayFileFileName.substring(0, assayFileFileName.length() - 3);
                 File file = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + fileName);
-                if (file.exists())
+                if (file.exists()) {
                     return file;
+                }
+            } else if (fileSource.equals(ProjectFileSource.SUBMITTED) && fileType.equals(ProjectFileType.RESULT)) {
+                resultFileName = assayFileFileName;
+            }
+        }
+
+        // try to find file on file system
+        if (resultFileName != null) {
+            String resultFileNameWithoutExtension = resultFileName.endsWith(Constants.GZIP_FILE_EXTENSION) ?
+                                            FilenameUtils.removeExtension(resultFileName.substring(0, resultFileName.length() - Constants.GZIP_FILE_EXTENSION.length())) :
+                                            FilenameUtils.removeExtension(resultFileName);
+
+            File file = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY +
+                    File.separator + resultFileNameWithoutExtension + Constants.PRIDE_MZTAB_SUFFIX);
+            if (file.exists()) {
+                return file;
             }
         }
 
         return null;
-    }
-
-    /**
-     * Find all the generated mgf files
-     *
-     * @param projectFilePath
-     * @param assayFiles
-     * @return
-     */
-    private List<File> findMgfFiles(String projectFilePath, List<ProjectFile> assayFiles) {
-        List<File> mgfFiles = new ArrayList<File>();
-
-        for (ProjectFile assayFile : assayFiles) {
-            if (assayFile.getFileSource().equals(ProjectFileSource.GENERATED) &&
-                    assayFile.getFileName().endsWith(Constants.PRIDE_MGF_SUFFIX_GZIPPED)) {
-                String fileName = assayFile.getFileName().substring(0, assayFile.getFileName().length() - 3);
-                File projectFile = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + fileName);
-                if (projectFile.exists())
-                    mgfFiles.add(projectFile);
-            }
-        }
-
-        return mgfFiles;
     }
 
 

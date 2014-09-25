@@ -100,4 +100,15 @@ public class MzTabIndexer {
 
         return psms;
     }
+
+    public Set<String> getMsRunFileNames() {
+        HashSet<String> fileNames = new HashSet<String>();
+
+        for (MsRun msRun : fileToMsRun.values()) {
+            String file = msRun.getLocation().getFile();
+            fileNames.add(FilenameUtils.getName(file));
+        }
+
+        return fileNames;
+    }
 }
