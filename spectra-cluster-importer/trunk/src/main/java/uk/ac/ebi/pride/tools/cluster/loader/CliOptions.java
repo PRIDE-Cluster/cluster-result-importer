@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.tools.cluster.importer;
+package uk.ac.ebi.pride.tools.cluster.loader;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;

@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.tools.cluster.importer;
+package uk.ac.ebi.pride.tools.cluster.loader;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -24,9 +24,9 @@ import java.util.Collection;
  * @author Rui Wang
  * @version $Id$
  */
-public class ClusterImporterMain {
+public class ClusteringFileLoader {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClusterImporterMain.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClusteringFileLoader.class);
 
     public static void main(String[] args) {
         CommandLineParser parser = new GnuParser();

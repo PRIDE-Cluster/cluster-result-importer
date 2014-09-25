@@ -69,7 +69,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>uk.ac.ebi.pride.tools.cluster.importer.ClusterImporterMain</mainClass>
+							<mainClass>uk.ac.ebi.pride.tools.cluster.loader.ClusteringFileLoader</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
