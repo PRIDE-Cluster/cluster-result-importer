@@ -14,6 +14,8 @@ public final class Constants {
 
     public static final String COMMA = ",";
 
+    public static final String GZIP_FILE_EXTENSION = ".gz";
+
     public static final String NEWT = "NEWT";
     public static final String BRENDA = "BTO";
     public static final String CL = "CL";
