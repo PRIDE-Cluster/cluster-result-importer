@@ -31,10 +31,8 @@ public class PSMSummaryTest {
         psm2.setArchivePSMId("PSM1");
         psm2.setSearchEngine("Engine2");
 
-
         assertEquals(psm1, psm2);
     }
-
 
     @Test
     public void testNotEqual() throws Exception {
@@ -52,7 +50,6 @@ public class PSMSummaryTest {
         psm2.setModifications("MOD1:MOD2");
         psm2.setArchivePSMId("PSM1");
         psm2.setSearchEngine("Engine2");
-
 
         assertNotSame(psm1, psm2);
     }
@@ -78,6 +75,4 @@ public class PSMSummaryTest {
 
         assertTrue(psmSummaries.contains(psm2));
     }
-
-
 }
