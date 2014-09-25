@@ -202,8 +202,9 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
 
             for (PSMSummary psm : psms) {
                 psm.setSpectrumId(spectrum.getId());
-                if (!psmSummaries.contains(psm))
+                if (!psmSummaries.contains(psm)) {
                     psmSummaries.add(psm);
+                }
             }
         }
 

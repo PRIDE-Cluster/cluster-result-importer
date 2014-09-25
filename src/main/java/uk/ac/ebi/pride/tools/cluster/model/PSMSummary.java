@@ -176,9 +176,8 @@ public class PSMSummary {
         PSMSummary that = (PSMSummary) o;
 
         if (!archivePSMId.equals(that.archivePSMId)) return false;
+        if (assayId != null ? !assayId.equals(that.assayId) : that.assayId != null) return false;
         if (modifications != null ? !modifications.equals(that.modifications) : that.modifications != null)
-            return false;
-        if (proteinAccession != null ? !proteinAccession.equals(that.proteinAccession) : that.proteinAccession != null)
             return false;
         if (!sequence.equals(that.sequence)) return false;
         if (spectrumId != null ? !spectrumId.equals(that.spectrumId) : that.spectrumId != null) return false;
@@ -189,10 +188,10 @@ public class PSMSummary {
     @Override
     public int hashCode() {
         int result = spectrumId != null ? spectrumId.hashCode() : 0;
+        result = 31 * result + (assayId != null ? assayId.hashCode() : 0);
         result = 31 * result + archivePSMId.hashCode();
         result = 31 * result + sequence.hashCode();
         result = 31 * result + (modifications != null ? modifications.hashCode() : 0);
-        result = 31 * result + (proteinAccession != null ? proteinAccession.hashCode() : 0);
         return result;
     }
 }

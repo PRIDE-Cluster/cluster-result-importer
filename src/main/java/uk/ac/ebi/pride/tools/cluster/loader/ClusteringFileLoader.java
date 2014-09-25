@@ -50,25 +50,33 @@ public class ClusteringFileLoader {
             if (!file.exists())
                 throw new Exception("Input .clustering file must be valid.");
 
-            // create data source
-            ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
 
-            // create cluster importer
-            IClusterWriteDao clusterDBImporter = new ClusterWriteDao(clusterRepositoryBuilder.getTransactionManager());
+            loadClusteringFile(file);
 
-            // create cluster source listener
-            ClusterSourceListener clusterSourceListener = new ClusterSourceListener(clusterDBImporter);
-            Collection<IClusterSourceListener> clusterSourceListeners = new ArrayList<IClusterSourceListener>();
-            clusterSourceListeners.add(clusterSourceListener);
-
-            // load clusters
-            ClusteringFileReader clusteringFileReader = new ClusteringFileReader(file);
-            clusteringFileReader.readClustersIteratively(clusterSourceListeners);
 
         } catch (Exception e) {
             logger.error("Error while running cluster importer", e);
             System.exit(1);
         }
+    }
+
+    private static void loadClusteringFile(File file) throws Exception {
+        logger.info("Loading clustering file: {}", file.getAbsolutePath());
+
+        // create data source
+        ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
+
+        // create cluster importer
+        IClusterWriteDao clusterDBImporter = new ClusterWriteDao(clusterRepositoryBuilder.getTransactionManager());
+
+        // create cluster source listener
+        ClusterSourceListener clusterSourceListener = new ClusterSourceListener(clusterDBImporter);
+        Collection<IClusterSourceListener> clusterSourceListeners = new ArrayList<IClusterSourceListener>();
+        clusterSourceListeners.add(clusterSourceListener);
+
+        // load clusters
+        ClusteringFileReader clusteringFileReader = new ClusteringFileReader(file);
+        clusteringFileReader.readClustersIteratively(clusterSourceListeners);
     }
 
     private static void printUsage() {

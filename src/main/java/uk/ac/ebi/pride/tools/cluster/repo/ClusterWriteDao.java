@@ -132,6 +132,7 @@ public class ClusterWriteDao implements IClusterWriteDao{
                     ClusteredPSMSummary clusteredPSMSummary = new ClusteredPSMSummary();
                     clusteredPSMSummary.setClusterId(cluster.getId());
                     clusteredPSMSummary.setPsmId(psmPk);
+                    clusteredPSMSummary.setSpectrumId(spectrumPk);
                     clusteredPSMSummary.setSequence(sequence);
                     cluster.addClusteredPSMSummary(clusteredPSMSummary);
                 }
