@@ -3,9 +3,7 @@ package uk.ac.ebi.pride.tools.cluster.utils;
 import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredPSMSummary;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Rui Wang
@@ -21,7 +19,8 @@ public final class ClusterSummaryUtils {
         for (ClusteredPSMSummary clusteredPSMSummary : psmSummaries) {
             String sequence = clusteredPSMSummary.getSequence();
             List<ClusteredPSMSummary> clusteredPSMSummaries = cluster.getClusteredPSMSummaries(sequence);
-            float ratio = clusteredPSMSummaries.size() / size;
+            int count = countDistinctSpectra(clusteredPSMSummaries);
+            float ratio = count / size;
             clusteredPSMSummary.setPsmRatio(ratio);
         }
 
@@ -39,6 +38,16 @@ public final class ClusterSummaryUtils {
             psmSummary.setRank(rank);
         }
 
+    }
+
+    private static int countDistinctSpectra(List<ClusteredPSMSummary> psms) {
+        Set<String> psmRepresentations = new HashSet<String>();
+
+        for (ClusteredPSMSummary psm : psms) {
+            psmRepresentations.add(psm.getSpectrumId() + "");
+        }
+
+        return psmRepresentations.size();
     }
 
 

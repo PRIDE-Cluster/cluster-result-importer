@@ -7,6 +7,7 @@ package uk.ac.ebi.pride.tools.cluster.model;
 public class ClusteredPSMSummary {
     private Long clusterId;
     private Long psmId;
+    private Long spectrumId;
     private String sequence;
     private float psmRatio;
     private int rank;
@@ -25,6 +26,14 @@ public class ClusteredPSMSummary {
 
     public void setPsmId(Long psmId) {
         this.psmId = psmId;
+    }
+
+    public Long getSpectrumId() {
+        return spectrumId;
+    }
+
+    public void setSpectrumId(Long spectrumId) {
+        this.spectrumId = spectrumId;
     }
 
     public String getSequence() {

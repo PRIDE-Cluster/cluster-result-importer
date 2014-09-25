@@ -65,42 +65,52 @@ public class ClusterSummaryUtilsTest {
 
         ClusteredPSMSummary clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("AAAAAAAAA");
+        clusteredPSMSummary.setSpectrumId(1111l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("AAAAAAAAA");
+        clusteredPSMSummary.setSpectrumId(1112l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("AAAAAAAAA");
+        clusteredPSMSummary.setSpectrumId(1113l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("AAAAAAAAA");
+        clusteredPSMSummary.setSpectrumId(1114l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("BBBBBBBBB");
+        clusteredPSMSummary.setSpectrumId(2221l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("BBBBBBBBB");
+        clusteredPSMSummary.setSpectrumId(2222l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("BBBBBBBBB");
+        clusteredPSMSummary.setSpectrumId(2223l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("CCCCCCCCC");
+        clusteredPSMSummary.setSpectrumId(3331l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("CCCCCCCCC");
+        clusteredPSMSummary.setSpectrumId(3332l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         clusteredPSMSummary = new ClusteredPSMSummary();
         clusteredPSMSummary.setSequence("DDDDDDDDD");
+        clusteredPSMSummary.setSpectrumId(4441l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
         ClusterSummaryUtils.updateClusteredPSMStatistics(clusterSummary);
