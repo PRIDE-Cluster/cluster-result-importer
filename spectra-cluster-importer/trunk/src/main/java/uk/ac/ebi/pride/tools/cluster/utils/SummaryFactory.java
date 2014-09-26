@@ -16,9 +16,7 @@ import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumRefe
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 import uk.ac.ebi.pride.tools.cluster.model.*;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -242,10 +240,12 @@ public final class SummaryFactory {
         clusterSummary.setAveragePrecursorCharge(averagePrecursorCharge);
 
         List<Float> consensusMzValues = cluster.getConsensusMzValues();
-        clusterSummary.setConsensusSpectrumMz(convertToByteArray(consensusMzValues));
+        String consensusSpectrumMz = convertFloatListToString(consensusMzValues, Constants.COMMA);
+        clusterSummary.setConsensusSpectrumMz(consensusSpectrumMz);
 
         List<Float> consensusIntensValues = cluster.getConsensusIntensValues();
-        clusterSummary.setConsensusSpectrumIntensity(convertToByteArray(consensusIntensValues));
+        String consensusSpectrumIntensity = convertFloatListToString(consensusIntensValues, Constants.COMMA);
+        clusterSummary.setConsensusSpectrumIntensity(consensusSpectrumIntensity);
 
         clusterSummary.setNumberOfSpectra(cluster.getSpecCount());
 
@@ -273,10 +273,16 @@ public final class SummaryFactory {
         return chargeSum/spectrumReferences.size();
     }
 
-    private static byte[] convertToByteArray(Collection<Float> content) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(content);
-        return bos.toByteArray();
+    private static String convertFloatListToString(List<Float> nums, String delimiter) {
+        if (nums.isEmpty()) {
+            throw new IllegalStateException("List of float number cannot be empty");
+        }
+
+        String concat = "";
+        for (Float num : nums) {
+            concat += num + delimiter;
+        }
+
+        return concat.substring(0, concat.length() - delimiter.length());
     }
 }

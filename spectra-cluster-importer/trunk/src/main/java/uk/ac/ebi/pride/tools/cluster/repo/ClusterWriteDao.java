@@ -83,9 +83,6 @@ public class ClusterWriteDao implements IClusterWriteDao{
     private void saveClusterSummary(final ClusterSummary cluster) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(template);
 
-        final byte[] mzByteArray = cluster.getConsensusSpectrumMz();
-        final byte[] intensityByteArray = cluster.getConsensusSpectrumIntensity();
-
         simpleJdbcInsert.withTableName("spectrum_cluster").usingGeneratedKeyColumns("cluster_pk");
 
         HashMap<String, Object> parameters = new HashMap<String, Object>();
@@ -93,12 +90,12 @@ public class ClusterWriteDao implements IClusterWriteDao{
         parameters.put("avg_precursor_charge", cluster.getAveragePrecursorCharge());
         parameters.put("number_of_spectra", cluster.getNumberOfSpectra());
         parameters.put("max_ratio", cluster.getMaxPeptideRatio());
-        parameters.put("consensus_spectrum_mz",mzByteArray);
-        parameters.put("consensus_spectrum_intensity", intensityByteArray);
+        parameters.put("consensus_spectrum_mz",cluster.getConsensusSpectrumMz());
+        parameters.put("consensus_spectrum_intensity", cluster.getConsensusSpectrumIntensity());
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource(parameters);
-        parameterSource.registerSqlType("consensus_spectrum_mz", Types.BINARY);
-        parameterSource.registerSqlType("consensus_spectrum_intensity", Types.BINARY);
+        parameterSource.registerSqlType("consensus_spectrum_mz", Types.CLOB);
+        parameterSource.registerSqlType("consensus_spectrum_intensity", Types.CLOB);
 
         Number key = simpleJdbcInsert.executeAndReturnKey(parameterSource);
         long clusterId = key.longValue();
