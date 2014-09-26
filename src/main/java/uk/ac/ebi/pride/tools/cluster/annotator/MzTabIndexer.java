@@ -3,6 +3,7 @@ package uk.ac.ebi.pride.tools.cluster.annotator;
 import org.apache.commons.io.FilenameUtils;
 import uk.ac.ebi.pride.jmztab.model.*;
 import uk.ac.ebi.pride.jmztab.utils.MZTabFileParser;
+import uk.ac.ebi.pride.jmztab.utils.errors.MZTabErrorList;
 import uk.ac.ebi.pride.tools.cluster.utils.PeptideUtils;
 
 import java.io.File;
@@ -30,12 +31,12 @@ public class MzTabIndexer {
         // todo: doesn't check the errors. This will cause some inconsistency on the links of PSM between
         // todo: PRIDE Cluster and PRIDE Archive
 
-//        MZTabErrorList errorList = mzTabFileParser.getErrorList();
-//        if (errorList.isEmpty()) {
+        MZTabErrorList errorList = mzTabFileParser.getErrorList();
+        if (errorList.isEmpty()) {
             index();
-//        } else {
-//            throw new IOException("mzTab file contains errors: " + mzTabFile.getAbsolutePath());
-//        }
+        } else {
+            // do nothing at the moment
+        }
     }
 
     public MzTabIndexer(MZTabFile mzTab) {

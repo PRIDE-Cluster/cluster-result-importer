@@ -10,8 +10,8 @@ public class ClusterSummary {
     private Long id;
     private float averagePrecursorMz;
     private float averagePrecursorCharge;
-    private byte[] consensusSpectrumMz;
-    private byte[] consensusSpectrumIntensity;
+    private String consensusSpectrumMz;
+    private String consensusSpectrumIntensity;
     private int numberOfSpectra;
     private float maxPeptideRatio;
     private final List<ClusteredSpectrumSummary> clusteredSpectrumSummaries = new ArrayList<ClusteredSpectrumSummary>();
@@ -43,19 +43,19 @@ public class ClusterSummary {
         this.averagePrecursorCharge = averagePrecursorCharge;
     }
 
-    public byte[] getConsensusSpectrumMz() {
+    public String getConsensusSpectrumMz() {
         return consensusSpectrumMz;
     }
 
-    public void setConsensusSpectrumMz(byte[] consensusSpectrumMz) {
+    public void setConsensusSpectrumMz(String consensusSpectrumMz) {
         this.consensusSpectrumMz = consensusSpectrumMz;
     }
 
-    public byte[] getConsensusSpectrumIntensity() {
+    public String getConsensusSpectrumIntensity() {
         return consensusSpectrumIntensity;
     }
 
-    public void setConsensusSpectrumIntensity(byte[] consensusSpectrumIntensity) {
+    public void setConsensusSpectrumIntensity(String consensusSpectrumIntensity) {
         this.consensusSpectrumIntensity = consensusSpectrumIntensity;
     }
 
