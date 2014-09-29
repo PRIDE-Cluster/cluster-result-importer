@@ -16,6 +16,7 @@ public class ClusterSummary {
     private float maxPeptideRatio;
     private final List<ClusteredSpectrumSummary> clusteredSpectrumSummaries = new ArrayList<ClusteredSpectrumSummary>();
     private final List<ClusteredPSMSummary> clusteredPSMSummaries = new ArrayList<ClusteredPSMSummary>();
+    private final List<AssaySummary> assaySummaries = new ArrayList<AssaySummary>();
     private final Map<String, ClusteredSpectrumSummary> spectrumRefToClusteredSpectrumSummary = new HashMap<String, ClusteredSpectrumSummary>();
     private final Map<String, List<ClusteredPSMSummary>> peptideToClusteredPSMSummary = new HashMap<String, List<ClusteredPSMSummary>>();
 
@@ -88,6 +89,12 @@ public class ClusterSummary {
         spectrumRefToClusteredSpectrumSummary.put(clusteredSpectrumSummary.getReferenceId(), clusteredSpectrumSummary);
     }
 
+    public void addClusteredSpectrumSummaries(List<ClusteredSpectrumSummary> clusteredSpectrumSummaries) {
+        for (ClusteredSpectrumSummary clusteredSpectrumSummary : clusteredSpectrumSummaries) {
+            addClusteredSpectrumSummary(clusteredSpectrumSummary);
+        }
+    }
+
     public List<ClusteredPSMSummary> getClusteredPSMSummaries() {
         return clusteredPSMSummaries;
     }
@@ -108,6 +115,24 @@ public class ClusterSummary {
         }
 
         psmSummaries.add(clusteredPSMSummary);
+    }
+
+    public void addClusteredPSMSummaries(List<ClusteredPSMSummary> clusteredPSMSummaries) {
+        for (ClusteredPSMSummary clusteredPSMSummary : clusteredPSMSummaries) {
+            addClusteredPSMSummary(clusteredPSMSummary);
+        }
+    }
+
+    public List<AssaySummary> getAssaySummaries() {
+        return assaySummaries;
+    }
+
+    public void addAssaySummary(AssaySummary assaySummary) {
+        assaySummaries.add(assaySummary);
+    }
+
+    public void addAssaySummaries(List<AssaySummary> assaySummaries) {
+        this.assaySummaries.addAll(assaySummaries);
     }
 
     private String cleanPeptideSequence(String original) {

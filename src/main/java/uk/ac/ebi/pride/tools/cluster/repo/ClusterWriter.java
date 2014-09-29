@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -73,13 +74,43 @@ public class ClusterWriter implements IClusterWriteDao{
 
                     saveClusteredPSMs(cluster.getClusteredPSMSummaries());
 
+                    float maxRatio = getMaxRatio(cluster.getClusteredPSMSummaries());
+
+                    updateMaxRatio(cluster, maxRatio);
+
                 } catch (Exception ex) {
                     status.setRollbackOnly();
                     String message = "Error persisting cluster: " + cluster.toString();
                     throw new ClusterImportException(message, ex);
                 }
             }
+
+
         });
+    }
+
+    private void updateMaxRatio(final ClusterSummary cluster, final float maxRatio) {
+        String UPDATE_QUERY = "update spectrum_cluster set max_ratio = ? where cluster_pk=?";
+
+        template.update(UPDATE_QUERY, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                ps.setFloat(1, maxRatio);
+                ps.setLong(2, cluster.getId());
+            }
+        });
+    }
+
+    private float getMaxRatio(List<ClusteredPSMSummary> clusteredPSMSummaries) {
+        float maxRatio = 0;
+
+        for (ClusteredPSMSummary clusteredPSMSummary : clusteredPSMSummaries) {
+            float ratio = clusteredPSMSummary.getPsmRatio();
+            if (ratio > maxRatio)
+                maxRatio = ratio;
+        }
+
+        return maxRatio;
     }
 
     private void saveClusterSummary(final ClusterSummary cluster) {
@@ -91,7 +122,7 @@ public class ClusterWriter implements IClusterWriteDao{
         parameters.put("avg_precursor_mz", cluster.getAveragePrecursorMz());
         parameters.put("avg_precursor_charge", cluster.getAveragePrecursorCharge());
         parameters.put("number_of_spectra", cluster.getNumberOfSpectra());
-        parameters.put("max_ratio", cluster.getMaxPeptideRatio());
+        parameters.put("max_ratio", 0);
         parameters.put("consensus_spectrum_mz",cluster.getConsensusSpectrumMz());
         parameters.put("consensus_spectrum_intensity", cluster.getConsensusSpectrumIntensity());
 
