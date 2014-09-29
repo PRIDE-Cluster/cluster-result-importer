@@ -15,7 +15,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredPSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredSpectrumSummary;
-import uk.ac.ebi.pride.tools.cluster.utils.ClusterSummaryUtils;
+import uk.ac.ebi.pride.tools.cluster.utils.ClusterUtils;
 import uk.ac.ebi.pride.tools.cluster.utils.CollectionUtils;
 import uk.ac.ebi.pride.tools.cluster.utils.Constants;
 
@@ -65,7 +65,7 @@ public class ClusterWriteDao implements IClusterWriteDao{
 
                     validateClusterMappings(cluster);
 
-                    ClusterSummaryUtils.updateClusteredPSMStatistics(cluster);
+                    ClusterUtils.updateClusteredPSMStatistics(cluster);
 
                     saveClusteredSpectra(cluster.getClusteredSpectrumSummaries());
 
