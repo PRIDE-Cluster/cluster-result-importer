@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
+ * Utility methods for accessing properties
+ *
  * @author Rui Wang
  * @version $Id$
  */

@@ -28,17 +28,19 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Writer class for inserting clusters
+ *
  * @author Rui Wang
  * @version $Id$
  */
-public class ClusterWriteDao implements IClusterWriteDao{
+public class ClusterWriter implements IClusterWriteDao{
 
-    private static final Logger logger = LoggerFactory.getLogger(ClusterWriteDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClusterWriter.class);
 
     private final JdbcTemplate template;
     private final TransactionTemplate transactionTemplate;
 
-    public ClusterWriteDao(DataSourceTransactionManager transactionManager) {
+    public ClusterWriter(DataSourceTransactionManager transactionManager) {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.template = new JdbcTemplate(transactionManager.getDataSource());
     }

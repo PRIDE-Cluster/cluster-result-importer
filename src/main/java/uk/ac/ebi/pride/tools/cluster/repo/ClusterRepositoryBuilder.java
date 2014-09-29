@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.tools.cluster.annotator;
+package uk.ac.ebi.pride.tools.cluster.repo;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
+ * Building a repository for accessing cluster database
+ *
  * @author Rui Wang
  * @version $Id$
  */

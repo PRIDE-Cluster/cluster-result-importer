@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.tools.cluster.annotator;
+package uk.ac.ebi.pride.tools.cluster.repo;
 
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -15,6 +15,8 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
+ * Building an PRIDE Archive access repository
+ *
  * @author Rui Wang
  * @version $Id$
  */
