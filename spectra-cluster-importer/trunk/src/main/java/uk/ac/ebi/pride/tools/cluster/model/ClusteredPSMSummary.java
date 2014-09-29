@@ -11,6 +11,7 @@ public class ClusteredPSMSummary {
     private String sequence;
     private float psmRatio;
     private int rank;
+    private PSMSummary psmSummary;
 
     public Long getClusterId() {
         return clusterId;
@@ -58,5 +59,13 @@ public class ClusteredPSMSummary {
 
     public void setRank(int rank) {
         this.rank = rank;
+    }
+
+    public PSMSummary getPsmSummary() {
+        return psmSummary;
+    }
+
+    public void setPsmSummary(PSMSummary psmSummary) {
+        this.psmSummary = psmSummary;
     }
 }

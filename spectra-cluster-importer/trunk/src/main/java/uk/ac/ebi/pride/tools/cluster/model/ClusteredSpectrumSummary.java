@@ -9,6 +9,7 @@ public class ClusteredSpectrumSummary {
     private Long spectrumId;
     private String referenceId;
     private float similarityScore;
+    private SpectrumSummary spectrumSummary;
 
     public Long getClusterId() {
         return clusterId;
@@ -40,5 +41,13 @@ public class ClusteredSpectrumSummary {
 
     public void setSimilarityScore(float similarityScore) {
         this.similarityScore = similarityScore;
+    }
+
+    public SpectrumSummary getSpectrumSummary() {
+        return spectrumSummary;
+    }
+
+    public void setSpectrumSummary(SpectrumSummary spectrumSummary) {
+        this.spectrumSummary = spectrumSummary;
     }
 }
