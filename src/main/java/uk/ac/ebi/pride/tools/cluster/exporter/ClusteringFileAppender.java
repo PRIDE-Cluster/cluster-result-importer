@@ -19,7 +19,7 @@ public class ClusteringFileAppender {
      */
     public static void appendCluster(final Appendable out, final ClusterSummary cluster) throws IOException {
         out.append("=Cluster=\n");
-        out.append("av_precursor_mz=").append(String.format("%10.3f", cluster.getAveragePrecursorMz()).trim());
+        out.append("av_precursor_mz=").append(String.format("%10.3f", cluster.getAveragePrecursorMz()));
         out.append("\n");
         out.append("av_precursor_intens=1.0");   // Useless, since intensities are completely random
         out.append("\n");
@@ -56,7 +56,7 @@ public class ClusteringFileAppender {
             // append precursor m/z as an extra column
             float precursorMz = spectrumSummary.getPrecursorMz();
             sb.append("\t");
-            sb.append(precursorMz);
+            sb.append(String.format("%10.3f", precursorMz));
 
             // append precursor charge as an extra column
             int precursorCharge = spectrumSummary.getPrecursorCharge();
@@ -80,7 +80,7 @@ public class ClusteringFileAppender {
             // append similarity score between consensus spectrum and spectrum
             float similarity = clusteredSpectrumSummary.getSimilarityScore();
             sb.append("\t");
-            sb.append(similarity);
+            sb.append(String.format("%10.3f", similarity));
 
             sb.append("\n");
 
