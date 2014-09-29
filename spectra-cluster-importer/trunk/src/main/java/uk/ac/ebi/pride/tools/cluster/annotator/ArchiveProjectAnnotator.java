@@ -18,9 +18,12 @@ import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
 import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
-import uk.ac.ebi.pride.tools.cluster.repo.ArchiveMetaDataWriterDao;
+import uk.ac.ebi.pride.tools.cluster.repo.ArchiveMetaDataWriter;
+import uk.ac.ebi.pride.tools.cluster.repo.ArchiveRepositoryBuilder;
+import uk.ac.ebi.pride.tools.cluster.repo.ClusterRepositoryBuilder;
 import uk.ac.ebi.pride.tools.cluster.repo.IArchiveMetaDataWriteDao;
 import uk.ac.ebi.pride.tools.cluster.utils.Constants;
+import uk.ac.ebi.pride.tools.cluster.utils.MzTabIndexer;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
 
 import java.io.File;
@@ -47,7 +50,7 @@ import java.util.*;
  * @author Rui Wang
  * @version $Id$
  */
-public class ArchiveProjectAnnotator implements IProjectAnnotator {
+public class ArchiveProjectAnnotator {
 
     public static final Logger logger = LoggerFactory.getLogger(ArchiveProjectAnnotator.class);
 
@@ -63,7 +66,6 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         this.archiveFileRootPath = archiveFileRootPath;
     }
 
-    @Override
     public void annotate(String projectAccession) {
         logger.info("Trying to annotation project: {}", projectAccession);
 
@@ -301,7 +303,7 @@ public class ArchiveProjectAnnotator implements IProjectAnnotator {
         // create connection to databases
         ArchiveRepositoryBuilder archiveRepositoryBuilder = new ArchiveRepositoryBuilder("prop/archive-database-oracle.properties");
         ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
-        ArchiveMetaDataWriterDao metaDataLoader = new ArchiveMetaDataWriterDao(clusterRepositoryBuilder.getTransactionManager());
+        ArchiveMetaDataWriter metaDataLoader = new ArchiveMetaDataWriter(clusterRepositoryBuilder.getTransactionManager());
 
         // create project annotator
         ArchiveProjectAnnotator annotator = new ArchiveProjectAnnotator(archiveRepositoryBuilder, metaDataLoader, archiveRootFilePath);

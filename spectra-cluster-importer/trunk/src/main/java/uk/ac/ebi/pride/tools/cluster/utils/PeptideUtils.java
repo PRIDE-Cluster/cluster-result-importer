@@ -1,6 +1,8 @@
 package uk.ac.ebi.pride.tools.cluster.utils;
 
 /**
+ * Utility method for formatting peptide sequences
+ *
  * @author Rui Wang
  * @version $Id$
  */

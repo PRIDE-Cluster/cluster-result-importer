@@ -1,4 +1,4 @@
-package uk.ac.ebi.pride.tools.cluster.annotator;
+package uk.ac.ebi.pride.tools.cluster.utils;
 
 import org.apache.commons.io.FilenameUtils;
 import uk.ac.ebi.pride.jmztab.model.*;

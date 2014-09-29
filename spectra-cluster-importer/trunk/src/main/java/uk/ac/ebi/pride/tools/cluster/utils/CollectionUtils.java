@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Utility methods for handling collections
+ *
  * @author Rui Wang
  * @version $Id$
  */

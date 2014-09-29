@@ -24,12 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Writer class for inserting metadata from PRIDE Archive
+ *
  * @author Rui Wang
  * @version $Id$
  */
-public class ArchiveMetaDataWriterDao implements IArchiveMetaDataWriteDao {
+public class ArchiveMetaDataWriter implements IArchiveMetaDataWriteDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(ArchiveMetaDataWriterDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(ArchiveMetaDataWriter.class);
 
     public static final int MAX_INCREMENT = 1000;
 
@@ -37,15 +39,12 @@ public class ArchiveMetaDataWriterDao implements IArchiveMetaDataWriteDao {
     private final TransactionTemplate transactionTemplate;
     private final DataFieldMaxValueIncrementer spectrumPrimaryKeyIncrementer;
     private final DataFieldMaxValueIncrementer psmPrimaryKeyIncrementer;
-    private final DataFieldMaxValueIncrementer clusterPrimaryKeyIncrementer;
 
-    public ArchiveMetaDataWriterDao(DataSourceTransactionManager transactionManager) {
+    public ArchiveMetaDataWriter(DataSourceTransactionManager transactionManager) {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.template = new JdbcTemplate(transactionManager.getDataSource());
         this.spectrumPrimaryKeyIncrementer = new OracleSequenceMaxValueIncrementer(template.getDataSource(), "spectrum_pk_sequence");
         this.psmPrimaryKeyIncrementer = new OracleSequenceMaxValueIncrementer(template.getDataSource(), "psm_pk_sequence");
-        this.clusterPrimaryKeyIncrementer = new OracleSequenceMaxValueIncrementer(template.getDataSource(), "cluster_pk_sequence");
-
     }
 
     @Override

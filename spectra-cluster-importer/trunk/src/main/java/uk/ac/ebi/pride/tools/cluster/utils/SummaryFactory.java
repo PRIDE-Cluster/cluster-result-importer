@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Factory methods for converting external objects to data source friendly version
+ *
  * @author Rui Wang
  * @version $Id$
  */
