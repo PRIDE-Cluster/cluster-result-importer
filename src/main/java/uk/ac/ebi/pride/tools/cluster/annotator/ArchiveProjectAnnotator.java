@@ -128,22 +128,31 @@ public class ArchiveProjectAnnotator {
      * @param mzTabFile mzTab file
      */
     private void loadMetaDataByMgfs(Project project, Assay assay, File mzTabFile, String projectFilePath) throws IOException {
-        MzTabIndexer mzTabIndexer = new MzTabIndexer(mzTabFile);
+        MzTabIndexer mzTabIndexer = null;
 
+        try {
+            mzTabIndexer = new MzTabIndexer(mzTabFile);
+        } catch (Exception ex) {
+            logger.error("Failed to load metadata for mzTab file: {}", mzTabFile.getAbsolutePath());
+            //NOTE: this is to avoid mzTab parsing exception to cause the whole project load fail
+        }
 
-        AssaySummary assaySummary = SummaryFactory.summariseAssay(project, assay);
-        clusterMetaDataLoader.saveAssay(assaySummary);
-        logger.info("Assay summary annotated. Assay database id: {}", assaySummary.getId());
+        if (mzTabIndexer != null) {
+            AssaySummary assaySummary = SummaryFactory.summariseAssay(project, assay);
+            clusterMetaDataLoader.saveAssay(assaySummary);
+            logger.info("Assay summary annotated. Assay database id: {}", assaySummary.getId());
 
-        Set<String> msRunFileNames = mzTabIndexer.getMsRunFileNames();
-        for (String msRunFileName : msRunFileNames) {
-            String mgfFileName = FilenameUtils.removeExtension(msRunFileName) + Constants.PRIDE_MGF_SUFFIX;
-            File mgfFile = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + mgfFileName);
-            if (mgfFile.exists()) {
-                logger.info("loading mgf file {}", mgfFile.getAbsolutePath());
-                loadMetaDataByMgf(assaySummary, mzTabIndexer, mgfFile);
+            Set<String> msRunFileNames = mzTabIndexer.getMsRunFileNames();
+            for (String msRunFileName : msRunFileNames) {
+                String mgfFileName = FilenameUtils.removeExtension(msRunFileName) + Constants.PRIDE_MGF_SUFFIX;
+                File mgfFile = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY + File.separator + mgfFileName);
+                if (mgfFile.exists()) {
+                    logger.info("loading mgf file {}", mgfFile.getAbsolutePath());
+                    loadMetaDataByMgf(assaySummary, mzTabIndexer, mgfFile);
+                }
             }
         }
+
     }
 
     /**
@@ -282,8 +291,8 @@ public class ArchiveProjectAnnotator {
         // try to find file on file system
         if (resultFileName != null) {
             String resultFileNameWithoutExtension = resultFileName.endsWith(Constants.GZIP_FILE_EXTENSION) ?
-                                            FilenameUtils.removeExtension(resultFileName.substring(0, resultFileName.length() - Constants.GZIP_FILE_EXTENSION.length())) :
-                                            FilenameUtils.removeExtension(resultFileName);
+                    FilenameUtils.removeExtension(resultFileName.substring(0, resultFileName.length() - Constants.GZIP_FILE_EXTENSION.length())) :
+                    FilenameUtils.removeExtension(resultFileName);
 
             File file = new File(projectFilePath + File.separator + Constants.INTERNAL_DIRECTORY +
                     File.separator + resultFileNameWithoutExtension + Constants.PRIDE_MZTAB_SUFFIX);
