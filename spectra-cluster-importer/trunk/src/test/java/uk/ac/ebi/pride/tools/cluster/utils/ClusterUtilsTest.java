@@ -2,10 +2,13 @@ package uk.ac.ebi.pride.tools.cluster.utils;
 
 import org.junit.Before;
 import org.junit.Test;
+import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ClusteringFileSpectrumReference;
+import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredPSMSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredSpectrumSummary;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  * @author Rui Wang
  * @version $Id$
  */
-public class ClusterSummaryUtilsTest {
+public class ClusterUtilsTest {
 
     private ClusterSummary clusterSummary;
 
@@ -113,7 +116,7 @@ public class ClusterSummaryUtilsTest {
         clusteredPSMSummary.setSpectrumId(4441l);
         clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
 
-        ClusterSummaryUtils.updateClusteredPSMStatistics(clusterSummary);
+        ClusterUtils.updateClusteredPSMStatistics(clusterSummary);
     }
 
     @Test
@@ -141,5 +144,18 @@ public class ClusterSummaryUtilsTest {
         for (ClusteredPSMSummary clusteredPSMSummary : clusteredPSMSummaries) {
             assertEquals(4, clusteredPSMSummary.getRank());
         }
+    }
+
+    @Test
+    public void testAveragePrecursorCharge() throws Exception {
+        List<ISpectrumReference> spectrumReferences = new ArrayList<ISpectrumReference>();
+        spectrumReferences.add(new ClusteringFileSpectrumReference("AAAA", 2, 123, "s1", 0.8f, "9606", null));
+        spectrumReferences.add(new ClusteringFileSpectrumReference("AAAA", 3, 123, "s1", 0.7f, "9606", null));
+        spectrumReferences.add(new ClusteringFileSpectrumReference("AAAA", 2, 123, "s1", 0.6f, "9606", null));
+        spectrumReferences.add(new ClusteringFileSpectrumReference("AAAA", 3, 123, "s1", 0.5f, "9606", null));
+
+        float averagePrecursorCharge = ClusterUtils.calculateAveragePrecursorCharge(spectrumReferences);
+        assertEquals(2.5f, averagePrecursorCharge, 0.00001);
+
     }
 }

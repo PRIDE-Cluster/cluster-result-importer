@@ -236,7 +236,8 @@ public final class SummaryFactory {
 
         clusterSummary.setAveragePrecursorMz(cluster.getAvPrecursorMz());
 
-        float averagePrecursorCharge = calculateAveragePrecursorCharge(cluster);
+        List<ISpectrumReference> spectrumReferences = cluster.getSpectrumReferences();
+        float averagePrecursorCharge = ClusterUtils.calculateAveragePrecursorCharge(spectrumReferences);
         clusterSummary.setAveragePrecursorCharge(averagePrecursorCharge);
 
         List<Float> consensusMzValues = cluster.getConsensusMzValues();
@@ -251,7 +252,7 @@ public final class SummaryFactory {
 
         clusterSummary.setMaxPeptideRatio(cluster.getMaxRatio());
 
-        for (ISpectrumReference spectrumReference : cluster.getSpectrumReferences()) {
+        for (ISpectrumReference spectrumReference : spectrumReferences) {
             ClusteredSpectrumSummary clusteredSpectrumSummary = new ClusteredSpectrumSummary();
             clusteredSpectrumSummary.setReferenceId(spectrumReference.getSpectrumId());
             clusteredSpectrumSummary.setSimilarityScore(spectrumReference.getSimilarityScore());
@@ -259,18 +260,6 @@ public final class SummaryFactory {
         }
 
         return clusterSummary;
-    }
-
-    private static float calculateAveragePrecursorCharge(ICluster cluster) {
-        List<ISpectrumReference> spectrumReferences = cluster.getSpectrumReferences();
-        int chargeSum = 0;
-        for (ISpectrumReference spectrumReference : spectrumReferences) {
-            int charge = spectrumReference.getCharge();
-            if (charge <= 0)
-                return 0;
-            chargeSum += charge;
-        }
-        return chargeSum/spectrumReferences.size();
     }
 
     private static String convertFloatListToString(List<Float> nums, String delimiter) {
