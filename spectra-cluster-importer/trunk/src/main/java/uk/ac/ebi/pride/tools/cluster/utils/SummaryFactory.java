@@ -239,7 +239,7 @@ public final class SummaryFactory {
         clusterSummary.setAveragePrecursorMz(cluster.getAvPrecursorMz());
 
         List<ISpectrumReference> spectrumReferences = cluster.getSpectrumReferences();
-        float averagePrecursorCharge = ClusterUtils.calculateAveragePrecursorCharge(spectrumReferences);
+        float averagePrecursorCharge = calculateAveragePrecursorCharge(spectrumReferences);
         clusterSummary.setAveragePrecursorCharge(averagePrecursorCharge);
 
         List<Float> consensusMzValues = cluster.getConsensusMzValues();
@@ -262,6 +262,23 @@ public final class SummaryFactory {
         }
 
         return clusterSummary;
+    }
+
+    /**
+     * Calculate the average precursor charge for a list of spectra
+     *
+     * @param spectrumReferences a list of spectra
+     * @return average precursor charge
+     */
+    public static float calculateAveragePrecursorCharge(List<ISpectrumReference> spectrumReferences) {
+        float chargeSum = 0;
+        for (ISpectrumReference spectrumReference : spectrumReferences) {
+            int charge = spectrumReference.getCharge();
+            if (charge <= 0)
+                return 0;
+            chargeSum += charge;
+        }
+        return chargeSum / spectrumReferences.size();
     }
 
     private static String convertFloatListToString(List<Float> nums, String delimiter) {

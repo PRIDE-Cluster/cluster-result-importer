@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.tools.cluster.utils;
 
-import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.model.ClusteredPSMSummary;
 
@@ -14,23 +13,6 @@ import java.util.*;
  */
 public final class ClusterUtils {
     private static final ClusteredPSMRatioComparator comparator = new ClusteredPSMRatioComparator();
-
-    /**
-     * Calculate the average precursor charge for a list of spectra
-     *
-     * @param spectrumReferences a list of spectra
-     * @return average precursor charge
-     */
-    public static float calculateAveragePrecursorCharge(List<ISpectrumReference> spectrumReferences) {
-        float chargeSum = 0;
-        for (ISpectrumReference spectrumReference : spectrumReferences) {
-            int charge = spectrumReference.getCharge();
-            if (charge <= 0)
-                return 0;
-            chargeSum += charge;
-        }
-        return chargeSum / spectrumReferences.size();
-    }
 
     /**
      * Update statistics on the clustered PSMs

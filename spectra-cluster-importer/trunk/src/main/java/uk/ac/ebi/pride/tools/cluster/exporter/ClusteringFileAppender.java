@@ -23,7 +23,6 @@ public class ClusteringFileAppender {
         out.append("av_precursor_intens=1.0");   // Useless, since intensities are completely random
         out.append("\n");
 
-
         String s = mostCommonPeptides(cluster);
         out.append("sequence=[" + s + "]");
         out.append("\n");
