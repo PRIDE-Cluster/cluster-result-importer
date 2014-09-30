@@ -155,12 +155,17 @@ public class ClusteringFileAppender {
             if (psmSummary.getSpectrumId().equals(clusteredSpectrumSummary.getSpectrumId())) {
                 if (modifications.length() > 0)
                     modifications += ";";
+
                 String mods = psmSummary.getModifications();
                 if (mods != null && mods.length() > 0) {
                     modifications += mods;
+                } else {
+                    modifications += "NO-MOD";
                 }
             }
         }
+
+        modifications = modifications.replaceAll("NO-MOD", "");
 
         return modifications;
     }
