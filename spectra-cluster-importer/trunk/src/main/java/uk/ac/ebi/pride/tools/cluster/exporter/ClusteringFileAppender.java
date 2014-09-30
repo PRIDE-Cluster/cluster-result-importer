@@ -4,8 +4,7 @@ import uk.ac.ebi.pride.spectracluster.util.CountedString;
 import uk.ac.ebi.pride.tools.cluster.model.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Rui Wang
@@ -19,7 +18,7 @@ public class ClusteringFileAppender {
      */
     public static void appendCluster(final Appendable out, final ClusterSummary cluster) throws IOException {
         out.append("=Cluster=\n");
-        out.append("av_precursor_mz=").append(String.format("%10.3f", cluster.getAveragePrecursorMz()));
+        out.append("av_precursor_mz=").append(String.format("%10.3f", cluster.getAveragePrecursorMz()).trim());
         out.append("\n");
         out.append("av_precursor_intens=1.0");   // Useless, since intensities are completely random
         out.append("\n");
@@ -56,7 +55,7 @@ public class ClusteringFileAppender {
             // append precursor m/z as an extra column
             float precursorMz = spectrumSummary.getPrecursorMz();
             sb.append("\t");
-            sb.append(String.format("%10.3f", precursorMz));
+            sb.append(String.format("%10.3f", precursorMz).trim());
 
             // append precursor charge as an extra column
             int precursorCharge = spectrumSummary.getPrecursorCharge();
@@ -80,7 +79,7 @@ public class ClusteringFileAppender {
             // append similarity score between consensus spectrum and spectrum
             float similarity = clusteredSpectrumSummary.getSimilarityScore();
             sb.append("\t");
-            sb.append(String.format("%10.3f", similarity));
+            sb.append(String.format("%10.3f", similarity).trim());
 
             sb.append("\n");
 
@@ -93,8 +92,22 @@ public class ClusteringFileAppender {
         List<ClusteredPSMSummary> clusteredPSMSummaries = cluster.getClusteredPSMSummaries();
 
         List<String> sequences = new ArrayList<String>();
+        Map<Long, Set<String>> spectrumIds = new HashMap<Long, Set<String>>();
         for (ClusteredPSMSummary clusteredPSMSummary : clusteredPSMSummaries) {
-            sequences.add(clusteredPSMSummary.getSequence());
+            Long spectrumId = clusteredPSMSummary.getSpectrumId();
+            String sequence = clusteredPSMSummary.getSequence();
+
+            Set<String> seqs = spectrumIds.get(spectrumId);
+            if (seqs != null && seqs.contains(sequence))
+                continue;
+
+            if (seqs == null) {
+                seqs = new HashSet<String>();
+                spectrumIds.put(spectrumId, seqs);
+            }
+
+            seqs.add(sequence);
+            sequences.add(sequence);
         }
 
         CountedString[] countedStrings = CountedString.getCountedStrings(sequences);

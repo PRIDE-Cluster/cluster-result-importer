@@ -14,13 +14,15 @@ public interface IClusterWriteDao {
 
     /**
      * Save a list of clusters
-     * @param clusters  a list of clusters
+     *
+     * @param clusters a list of clusters
      */
     void saveClusters(List<ClusterSummary> clusters);
 
     /**
      * Save a single cluster
-     * @param cluster   given cluster
+     *
+     * @param cluster given cluster
      */
     void saveCluster(ClusterSummary cluster);
 }

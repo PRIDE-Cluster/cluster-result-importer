@@ -34,7 +34,7 @@ import java.util.List;
  * @author Rui Wang
  * @version $Id$
  */
-public class ClusterWriter implements IClusterWriteDao{
+public class ClusterWriter implements IClusterWriteDao {
 
     private static final Logger logger = LoggerFactory.getLogger(ClusterWriter.class);
 
@@ -123,7 +123,7 @@ public class ClusterWriter implements IClusterWriteDao{
         parameters.put("avg_precursor_charge", cluster.getAveragePrecursorCharge());
         parameters.put("number_of_spectra", cluster.getNumberOfSpectra());
         parameters.put("max_ratio", 0);
-        parameters.put("consensus_spectrum_mz",cluster.getConsensusSpectrumMz());
+        parameters.put("consensus_spectrum_mz", cluster.getConsensusSpectrumMz());
         parameters.put("consensus_spectrum_intensity", cluster.getConsensusSpectrumIntensity());
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource(parameters);
@@ -145,7 +145,7 @@ public class ClusterWriter implements IClusterWriteDao{
         String SELECT_QUERY = "select spectrum.spectrum_pk, spectrum.spectrum_ref, psm.psm_pk, psm.sequence from spectrum " +
                 "join psm on (spectrum.spectrum_pk = psm.spectrum_fk) where spectrum.spectrum_ref in ";
 
-        List<String> queries = concatenateSpectrumReferencesForQuery(cluster.getClusteredSpectrumSummaries(), 100);
+        List<String> queries = concatenateSpectrumReferencesForQuery(cluster.getClusteredSpectrumSummaries(), 500);
         for (final String query : queries) {
             String sql = SELECT_QUERY + "(" + query + ")";
             template.query(sql, new RowCallbackHandler() {
@@ -212,7 +212,7 @@ public class ClusterWriter implements IClusterWriteDao{
 
     private void saveClusteredSpectra(final List<ClusteredSpectrumSummary> clusteredSpectra) {
         String INSERT_QUERY = "INSERT INTO cluster_has_spectrum (cluster_fk, spectrum_fk, similarity) " +
-                              "VALUES (?, ?, ?)";
+                "VALUES (?, ?, ?)";
 
         template.batchUpdate(INSERT_QUERY, new BatchPreparedStatementSetter() {
             @Override
@@ -232,7 +232,7 @@ public class ClusterWriter implements IClusterWriteDao{
 
     private void saveClusteredPSMs(final List<ClusteredPSMSummary> clusteredPSMSummaries) {
         String INSERT_QUERY = "INSERT INTO cluster_has_psm (cluster_fk, psm_fk, ratio, rank) " +
-                              "VALUES (?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?)";
 
         template.batchUpdate(INSERT_QUERY, new BatchPreparedStatementSetter() {
             @Override
