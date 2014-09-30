@@ -174,8 +174,8 @@ public class ArchiveMetaDataWriter implements IArchiveMetaDataWriteDao {
 
     private void saveSpectraWithPrimaryKey(final List<SpectrumSummary> spectra) {
         String INSERT_QUERY = "INSERT INTO spectrum (spectrum_pk, spectrum_ref, assay_fk, " +
-                              "precursor_mz, precursor_charge, is_identified) " +
-                              "VALUES (?, ?, ?, ?, ?, ?)";
+                "precursor_mz, precursor_charge, is_identified) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         template.batchUpdate(INSERT_QUERY, new BatchPreparedStatementSetter() {
             @Override

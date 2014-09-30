@@ -4,7 +4,6 @@ import org.apache.commons.io.FilenameUtils;
 import uk.ac.ebi.pride.jmztab.model.*;
 import uk.ac.ebi.pride.jmztab.utils.MZTabFileParser;
 import uk.ac.ebi.pride.jmztab.utils.errors.MZTabErrorList;
-import uk.ac.ebi.pride.tools.cluster.utils.PeptideUtils;
 
 import java.io.File;
 import java.io.IOException;

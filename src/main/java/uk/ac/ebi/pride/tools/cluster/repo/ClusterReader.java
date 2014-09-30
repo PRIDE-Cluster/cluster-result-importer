@@ -8,8 +8,10 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.ebi.pride.tools.cluster.model.*;
+import uk.ac.ebi.pride.tools.cluster.utils.CollectionUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +36,117 @@ public class ClusterReader implements IClusterReadDao {
         this.template = new JdbcTemplate(transactionManager.getDataSource());
     }
 
+    public List<SpectrumSummary> findSpectra(final List<String> spectrumReferences) {
+        final List<SpectrumSummary> spectrumSummaries = new ArrayList<SpectrumSummary>();
+
+        final List<String> concatenateIds = concatenateIds(spectrumReferences, 500);
+
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                try {
+                    for (String concatenateId : concatenateIds) {
+                        final String SELECT_QUERY = "select * from spectrum where spectrum_ref in (" + concatenateId + ")";
+
+                        template.query(SELECT_QUERY, new RowCallbackHandler() {
+                            @Override
+                            public void processRow(ResultSet rs) throws SQLException {
+                                SpectrumSummary spectrumSummary = new SpectrumSummary();
+
+                                spectrumSummary.setId(rs.getLong("spectrum_pk"));
+                                spectrumSummary.setReferenceId(rs.getString("spectrum_ref"));
+                                spectrumSummary.setAssayId(rs.getLong("assay_fk"));
+                                spectrumSummary.setPrecursorMz(rs.getFloat("precursor_mz"));
+                                spectrumSummary.setPrecursorCharge(rs.getInt("precursor_charge"));
+                                spectrumSummary.setIdentified(rs.getBoolean("is_identified"));
+
+                                spectrumSummaries.add(spectrumSummary);
+                            }
+                        });
+                    }
+                } catch (Exception ex) {
+                    String message = "Error while reading spectra";
+                    logger.error(message);
+                    throw new ClusterReadException(message, ex);
+                }
+            }
+        });
+
+        return spectrumSummaries;
+    }
+
+    public List<PSMSummary> findPSMBySpectrumId(final List<Long> spectrumIds) {
+        final List<PSMSummary> psmSummaries = new ArrayList<PSMSummary>();
+
+        final List<String> concatenateIds = concatenateIds(spectrumIds, 500);
+
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                try {
+                    for (String concatenateId : concatenateIds) {
+                        final String SELECT_QUERY = "select * from psm where spectrum_fk in (" + concatenateId + ")";
+
+                        template.query(SELECT_QUERY, new RowCallbackHandler() {
+                            @Override
+                            public void processRow(ResultSet rs) throws SQLException {
+                                PSMSummary psmSummary = new PSMSummary();
+                                psmSummary.setId(rs.getLong("psm_pk"));
+                                psmSummary.setSpectrumId(rs.getLong("spectrum_fk"));
+                                psmSummary.setAssayId(rs.getLong("assay_fk"));
+                                psmSummary.setArchivePSMId(rs.getString("archive_psm_id"));
+                                psmSummary.setSequence(rs.getString("sequence"));
+                                psmSummary.setModifications(rs.getString("modifications"));
+                                psmSummary.setSearchEngine(rs.getString("search_engine"));
+                                psmSummary.setSearchEngineScores(rs.getString("search_engine_scores"));
+                                psmSummary.setSearchDatabase(rs.getString("search_database"));
+                                psmSummary.setProteinAccession(rs.getString("protein_accession"));
+                                psmSummary.setProteinGroup(rs.getString("protein_group"));
+                                psmSummary.setProteinName(rs.getString("protein_name"));
+                                psmSummary.setStartPosition(rs.getInt("start_position"));
+                                psmSummary.setStopPosition(rs.getInt("stop_position"));
+                                psmSummary.setPreAminoAcid(rs.getString("pre_amino_acid"));
+                                psmSummary.setPostAminoAcid(rs.getString("post_amino_acid"));
+                                psmSummary.setDeltaMZ(rs.getFloat("delta_mz"));
+                                psmSummary.setQuantificationLabel(rs.getString("quantification_label"));
+
+                                psmSummaries.add(psmSummary);
+                            }
+                        });
+                    }
+                } catch (Exception ex) {
+                    String message = "Error while reading psms";
+                    logger.error(message);
+                    throw new ClusterReadException(message, ex);
+                }
+            }
+        });
+
+        return psmSummaries;
+    }
+
+    public List<AssaySummary> findAssays(final List<Long> assayIds) {
+        final HashSet<Long> ids = new HashSet<Long>(assayIds);
+
+        List<AssaySummary> assaySummaries = transactionTemplate.execute(new TransactionCallback<List<AssaySummary>>() {
+
+            @Override
+            public List<AssaySummary> doInTransaction(TransactionStatus status) {
+                try {
+                    return findAssaySummaries(ids);
+                } catch (Exception ex) {
+                    String message = "Error while counting the number of clusters";
+                    logger.error(message);
+                    throw new ClusterReadException(message, ex);
+                }
+            }
+        });
+
+        return assaySummaries;
+    }
+
     @Override
     public long getNumberOfClusters() {
         final String QUERY = "select count(*) from spectrum_cluster";
@@ -47,7 +160,7 @@ public class ClusterReader implements IClusterReadDao {
                 } catch (Exception ex) {
                     String message = "Error while counting the number of clusters";
                     logger.error(message);
-                    throw new ClusterImportException(message, ex);
+                    throw new ClusterReadException(message, ex);
                 }
             }
         });
@@ -82,7 +195,7 @@ public class ClusterReader implements IClusterReadDao {
                         }
 
                         // read assay details
-                        List<AssaySummary> assaySummaries = findAssaySummary(assayIds);
+                        List<AssaySummary> assaySummaries = findAssaySummaries(assayIds);
                         cluster.addAssaySummaries(assaySummaries);
                     }
 
@@ -91,7 +204,7 @@ public class ClusterReader implements IClusterReadDao {
                 } catch (Exception ex) {
                     String message = "Error while reading cluster: " + clusterId;
                     logger.error(message);
-                    throw new ClusterImportException(message, ex);
+                    throw new ClusterReadException(message, ex);
                 }
             }
         });
@@ -129,7 +242,7 @@ public class ClusterReader implements IClusterReadDao {
         final ArrayList<ClusteredSpectrumSummary> clusteredSpectrumSummaries = new ArrayList<ClusteredSpectrumSummary>();
 
         final String SPECTRUM_QUERY = "select * from cluster_has_spectrum join spectrum on (spectrum_fk = spectrum_pk) " +
-                                      "where cluster_fk=?";
+                "where cluster_fk=?";
 
         template.query(SPECTRUM_QUERY, new PreparedStatementSetter() {
             @Override
@@ -211,7 +324,7 @@ public class ClusterReader implements IClusterReadDao {
         return clusteredPSMSummaries;
     }
 
-    private List<AssaySummary> findAssaySummary(final Set<Long> assayIds) {
+    private List<AssaySummary> findAssaySummaries(final Collection<Long> assayIds) {
         final List<AssaySummary> assaySummaries = new ArrayList<AssaySummary>();
 
         String concatenateIds = concatenateIds(assayIds);
@@ -245,13 +358,28 @@ public class ClusterReader implements IClusterReadDao {
         return assaySummaries;
     }
 
-    private String concatenateIds(final Set<Long> ids) {
+    private String concatenateIds(final Collection ids) {
         String concatIds = "";
 
-        for (Long id : ids) {
-            concatIds += "'" + id + "',";
+        for (Object id : ids) {
+            concatIds += "'" + id.toString() + "',";
         }
 
         return concatIds.substring(0, concatIds.length() - 1);
+    }
+
+    private List<String> concatenateIds(final List ids, int limit) {
+        List<String> queries = new ArrayList<String>();
+
+        List<List> chunks = CollectionUtils.chunks(ids, limit);
+        for (List chunk : chunks) {
+            String query = "";
+            for (Object id : chunk) {
+                query += "'" + id.toString() + "',";
+            }
+            queries.add(query.substring(0, query.length() - 1));
+        }
+
+        return queries;
     }
 }

@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.ClusteringFileReader;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.IClusterSourceListener;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
-import uk.ac.ebi.pride.tools.cluster.repo.ClusterRepositoryBuilder;
 import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
+import uk.ac.ebi.pride.tools.cluster.repo.ClusterRepositoryBuilder;
 import uk.ac.ebi.pride.tools.cluster.repo.ClusterWriter;
 import uk.ac.ebi.pride.tools.cluster.repo.IClusterWriteDao;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
@@ -95,8 +95,10 @@ public class ClusteringFileLoader {
         @Override
         public void onNewClusterRead(ICluster newCluster) {
             try {
-                ClusterSummary clusterSummary = SummaryFactory.summariseCluster(newCluster);
-                clusterImporter.saveCluster(clusterSummary);
+                if (newCluster.getSpecCount() > 1) {
+                    ClusterSummary clusterSummary = SummaryFactory.summariseCluster(newCluster);
+                    clusterImporter.saveCluster(clusterSummary);
+                }
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to summaries cluster", e);
             }

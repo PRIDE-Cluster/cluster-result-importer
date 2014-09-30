@@ -17,8 +17,9 @@ public final class ClusterUtils {
 
     /**
      * Calculate the average precursor charge for a list of spectra
-     * @param spectrumReferences    a list of spectra
-     * @return  average precursor charge
+     *
+     * @param spectrumReferences a list of spectra
+     * @return average precursor charge
      */
     public static float calculateAveragePrecursorCharge(List<ISpectrumReference> spectrumReferences) {
         float chargeSum = 0;
@@ -28,15 +29,16 @@ public final class ClusterUtils {
                 return 0;
             chargeSum += charge;
         }
-        return chargeSum/spectrumReferences.size();
+        return chargeSum / spectrumReferences.size();
     }
 
     /**
      * Update statistics on the clustered PSMs
-     * @param cluster   cluster
+     *
+     * @param cluster cluster
      */
     public static void updateClusteredPSMStatistics(final ClusterSummary cluster) {
-        float size = (float)cluster.getClusteredSpectrumSummaries().size();
+        float size = (float) cluster.getClusteredSpectrumSummaries().size();
 
         List<ClusteredPSMSummary> psmSummaries = cluster.getClusteredPSMSummaries();
         for (ClusteredPSMSummary clusteredPSMSummary : psmSummaries) {

@@ -13,9 +13,9 @@ public class PeptideUtils {
     public static String cleanPeptideSequence(String peptideSequence) {
         String res = null;
 
-        if(peptideSequence!= null){
+        if (peptideSequence != null) {
             res = peptideSequence.toUpperCase();
-            res = res.replaceAll(NO_PEPTIDE_REGEX,"");
+            res = res.replaceAll(NO_PEPTIDE_REGEX, "");
         }
 
         return res;
