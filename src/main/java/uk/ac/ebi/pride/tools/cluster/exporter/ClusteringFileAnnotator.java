@@ -61,7 +61,7 @@ public class ClusteringFileAnnotator {
         List<Long> spectrumIds = new ArrayList<Long>();
         List<SpectrumSummary> spectra = clusterReader.findSpectra(spectrumRefs);
         if (spectra.size() != clusteredSpectrumSummaries.size()) {
-            throw new IllegalStateException("The number of spectra found doesn't match the number of clustered spectra");
+            logger.error("The number of spectra found doesn't match the number of clustered spectra: {} missing", spectra.size() - clusteredSpectrumSummaries.size());
         }
 
         for (SpectrumSummary spectrumSummary : spectra) {
