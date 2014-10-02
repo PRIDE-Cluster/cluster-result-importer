@@ -40,7 +40,8 @@ public class ClusteringFileAnnotator {
 
         for (ICluster cluster : clusters) {
             ClusterSummary clusterSummary = annotateCluster(cluster);
-            ClusteringFileAppender.appendCluster(writer, clusterSummary);
+            if (clusterSummary != null)
+                ClusteringFileAppender.appendCluster(writer, clusterSummary);
         }
 
         logger.info("Annotated {} clusters.", clusters.size());
@@ -62,38 +63,37 @@ public class ClusteringFileAnnotator {
         List<SpectrumSummary> spectra = clusterReader.findSpectra(spectrumRefs);
         if (spectra.size() != clusteredSpectrumSummaries.size()) {
             logger.error("The number of spectra found doesn't match the number of clustered spectra: {} missing", spectra.size() - clusteredSpectrumSummaries.size());
+            return null;
         }
 
-        if (spectra.size() > 0) {
-            for (SpectrumSummary spectrumSummary : spectra) {
-                Long spectrumId = spectrumSummary.getId();
-                spectrumIds.add(spectrumId);
-                String referenceId = spectrumSummary.getReferenceId();
-                for (ClusteredSpectrumSummary clusteredSpectrumSummary : clusteredSpectrumSummaries) {
-                    if (clusteredSpectrumSummary.getReferenceId().equals(referenceId)) {
-                        clusteredSpectrumSummary.setSpectrumId(spectrumId);
-                        clusteredSpectrumSummary.setSpectrumSummary(spectrumSummary);
-                    }
+        for (SpectrumSummary spectrumSummary : spectra) {
+            Long spectrumId = spectrumSummary.getId();
+            spectrumIds.add(spectrumId);
+            String referenceId = spectrumSummary.getReferenceId();
+            for (ClusteredSpectrumSummary clusteredSpectrumSummary : clusteredSpectrumSummaries) {
+                if (clusteredSpectrumSummary.getReferenceId().equals(referenceId)) {
+                    clusteredSpectrumSummary.setSpectrumId(spectrumId);
+                    clusteredSpectrumSummary.setSpectrumSummary(spectrumSummary);
                 }
             }
-
-            List<Long> assayIds = new ArrayList<Long>();
-            List<PSMSummary> psms = clusterReader.findPSMBySpectrumId(spectrumIds);
-            for (PSMSummary psm : psms) {
-                Long psmId = psm.getId();
-                Long assayId = psm.getAssayId();
-                assayIds.add(assayId);
-                ClusteredPSMSummary clusteredPSMSummary = new ClusteredPSMSummary();
-                clusteredPSMSummary.setSpectrumId(psm.getSpectrumId());
-                clusteredPSMSummary.setSequence(psm.getSequence());
-                clusteredPSMSummary.setPsmId(psmId);
-                clusteredPSMSummary.setPsmSummary(psm);
-                clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
-            }
-
-            List<AssaySummary> assays = clusterReader.findAssays(assayIds);
-            clusterSummary.addAssaySummaries(assays);
         }
+
+        List<Long> assayIds = new ArrayList<Long>();
+        List<PSMSummary> psms = clusterReader.findPSMBySpectrumId(spectrumIds);
+        for (PSMSummary psm : psms) {
+            Long psmId = psm.getId();
+            Long assayId = psm.getAssayId();
+            assayIds.add(assayId);
+            ClusteredPSMSummary clusteredPSMSummary = new ClusteredPSMSummary();
+            clusteredPSMSummary.setSpectrumId(psm.getSpectrumId());
+            clusteredPSMSummary.setSequence(psm.getSequence());
+            clusteredPSMSummary.setPsmId(psmId);
+            clusteredPSMSummary.setPsmSummary(psm);
+            clusterSummary.addClusteredPSMSummary(clusteredPSMSummary);
+        }
+
+        List<AssaySummary> assays = clusterReader.findAssays(assayIds);
+        clusterSummary.addAssaySummaries(assays);
 
         return clusterSummary;
     }
