@@ -19,6 +19,7 @@ public class ClusteringFileAppender {
     public static void appendCluster(final Appendable out, final ClusterSummary cluster) throws IOException {
         out.append("=Cluster=\n");
         out.append("id=").append(cluster.getClusterId());
+        out.append("\n");
         out.append("av_precursor_mz=").append(String.format("%10.3f", cluster.getAveragePrecursorMz()).trim());
         out.append("\n");
         out.append("av_precursor_intens=1.0");   // Useless, since intensities are completely random
