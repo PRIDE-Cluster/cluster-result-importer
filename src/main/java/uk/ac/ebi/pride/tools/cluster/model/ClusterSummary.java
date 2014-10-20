@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public class ClusterSummary {
     private Long id;
+    private String clusterId;
     private float averagePrecursorMz;
     private float averagePrecursorCharge;
     private String consensusSpectrumMz;
@@ -29,6 +30,14 @@ public class ClusterSummary {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
     }
 
     public float getAveragePrecursorMz() {

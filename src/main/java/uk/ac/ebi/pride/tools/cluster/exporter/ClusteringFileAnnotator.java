@@ -12,6 +12,7 @@ import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Rui Wang
@@ -52,6 +53,8 @@ public class ClusteringFileAnnotator {
 
     private ClusterSummary annotateCluster(ICluster cluster) throws IOException {
         ClusterSummary clusterSummary = SummaryFactory.summariseCluster(cluster);
+
+        clusterSummary.setClusterId(UUID.randomUUID().toString());
 
         List<String> spectrumRefs = new ArrayList<String>();
         List<ClusteredSpectrumSummary> clusteredSpectrumSummaries = clusterSummary.getClusteredSpectrumSummaries();
