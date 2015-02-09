@@ -42,6 +42,7 @@
         <jmztab.version>3.0.0</jmztab.version>
         <spectra-cluster.version>1.0.5-SNAPSHOT</spectra-cluster.version>
         <archive-data-provider-api.version>2.0.5</archive-data-provider-api.version>
+        <spectra-cluster-repo.version>1.0.1-SNAPSHOT</spectra-cluster-repo.version>
     </properties>
 
 	<build>
@@ -140,6 +141,13 @@
             <groupId>uk.ac.ebi.pride.spectracluster</groupId>
             <artifactId>spectra-cluster</artifactId>
             <version>${spectra-cluster.version}</version>
+        </dependency>
+
+        <!-- cluster repo -->
+        <dependency>
+            <groupId>uk.ac.ebi.pride.spectracluster</groupId>
+            <artifactId>spectra-cluster-repo</artifactId>
+            <version>${spectra-cluster-repo.version}</version>
         </dependency>
 
         <!--clustering file reader -->

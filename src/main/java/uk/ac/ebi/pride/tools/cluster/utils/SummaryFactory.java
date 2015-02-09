@@ -13,8 +13,8 @@ import uk.ac.ebi.pride.jmztab.model.Param;
 import uk.ac.ebi.pride.jmztab.model.SplitList;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
+import uk.ac.ebi.pride.spectracluster.repo.model.*;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
-import uk.ac.ebi.pride.tools.cluster.model.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -28,8 +28,8 @@ import java.util.List;
  */
 public final class SummaryFactory {
 
-    public static AssaySummary summariseAssay(Project project, Assay assay) {
-        AssaySummary assaySummary = new AssaySummary();
+    public static AssayDetail summariseAssay(Project project, Assay assay) {
+        AssayDetail assaySummary = new AssayDetail();
 
         assaySummary.setAccession(assay.getAccession());
         assaySummary.setProjectAccession(project.getAccession());
@@ -130,10 +130,10 @@ public final class SummaryFactory {
      * @param assayId assay id is the primary key assigned at the data store level
      * @return
      */
-    public static PSMSummary summarisePSM(PSM psm, String projectAccession,
+    public static PSMDetail summarisePSM(PSM psm, String projectAccession,
                                           Long assayId, String assayAccession,
                                           int numOfMsRun) {
-        PSMSummary psmSummary = new PSMSummary();
+        PSMDetail psmSummary = new PSMDetail();
 
         psmSummary.setAssayId(assayId);
 
@@ -220,8 +220,8 @@ public final class SummaryFactory {
     }
 
 
-    public static SpectrumSummary summariseSpectrum(ISpectrum spectrum, Long assayId, boolean identified) {
-        SpectrumSummary spectrumSummary = new SpectrumSummary();
+    public static SpectrumDetail summariseSpectrum(ISpectrum spectrum, Long assayId, boolean identified) {
+        SpectrumDetail spectrumSummary = new SpectrumDetail();
 
         spectrumSummary.setAssayId(assayId);
         spectrumSummary.setReferenceId(spectrum.getId());
@@ -233,8 +233,8 @@ public final class SummaryFactory {
     }
 
 
-    public static ClusterSummary summariseCluster(ICluster cluster) throws IOException {
-        ClusterSummary clusterSummary = new ClusterSummary();
+    public static ClusterDetail summariseCluster(ICluster cluster) throws IOException {
+        ClusterDetail clusterSummary = new ClusterDetail();
 
         clusterSummary.setAveragePrecursorMz(cluster.getAvPrecursorMz());
 
@@ -255,7 +255,7 @@ public final class SummaryFactory {
         clusterSummary.setMaxPeptideRatio(cluster.getMaxRatio());
 
         for (ISpectrumReference spectrumReference : spectrumReferences) {
-            ClusteredSpectrumSummary clusteredSpectrumSummary = new ClusteredSpectrumSummary();
+            ClusteredSpectrumDetail clusteredSpectrumSummary = new ClusteredSpectrumDetail();
             clusteredSpectrumSummary.setReferenceId(spectrumReference.getSpectrumId());
             clusteredSpectrumSummary.setSimilarityScore(spectrumReference.getSimilarityScore());
             clusterSummary.addClusteredSpectrumSummary(clusteredSpectrumSummary);

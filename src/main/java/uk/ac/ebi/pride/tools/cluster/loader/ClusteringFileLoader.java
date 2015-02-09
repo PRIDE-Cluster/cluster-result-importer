@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.ClusteringFileReader;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.IClusterSourceListener;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
-import uk.ac.ebi.pride.tools.cluster.model.ClusterSummary;
+import uk.ac.ebi.pride.spectracluster.repo.dao.IClusterWriteDao;
+import uk.ac.ebi.pride.spectracluster.repo.model.ClusterDetail;
+import uk.ac.ebi.pride.tools.cluster.dao.TransactionAwareClusterWriter;
 import uk.ac.ebi.pride.tools.cluster.repo.ClusterRepositoryBuilder;
-import uk.ac.ebi.pride.tools.cluster.repo.ClusterWriter;
-import uk.ac.ebi.pride.tools.cluster.repo.IClusterWriteDao;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
 
 import java.io.File;
@@ -67,7 +67,7 @@ public class ClusteringFileLoader {
         ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
 
         // create cluster importer
-        IClusterWriteDao clusterDBImporter = new ClusterWriter(clusterRepositoryBuilder.getTransactionManager());
+        IClusterWriteDao clusterDBImporter = new TransactionAwareClusterWriter(clusterRepositoryBuilder.getTransactionManager());
 
         // create cluster source listener
         ClusterSourceListener clusterSourceListener = new ClusterSourceListener(clusterDBImporter);
@@ -96,14 +96,12 @@ public class ClusteringFileLoader {
         public void onNewClusterRead(ICluster newCluster) {
             try {
                 if (newCluster.getSpecCount() > 1) {
-                    ClusterSummary clusterSummary = SummaryFactory.summariseCluster(newCluster);
+                    ClusterDetail clusterSummary = SummaryFactory.summariseCluster(newCluster);
                     clusterImporter.saveCluster(clusterSummary);
                 }
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to summaries cluster", e);
             }
-
         }
     }
-
 }

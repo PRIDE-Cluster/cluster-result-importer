@@ -14,14 +14,14 @@ import uk.ac.ebi.pride.archive.repo.project.ProjectRepository;
 import uk.ac.ebi.pride.jmztab.model.MsRun;
 import uk.ac.ebi.pride.jmztab.model.PSM;
 import uk.ac.ebi.pride.spectracluster.io.ParserUtilities;
+import uk.ac.ebi.pride.spectracluster.repo.dao.IClusterWriteDao;
+import uk.ac.ebi.pride.spectracluster.repo.model.AssayDetail;
+import uk.ac.ebi.pride.spectracluster.repo.model.PSMDetail;
+import uk.ac.ebi.pride.spectracluster.repo.model.SpectrumDetail;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
-import uk.ac.ebi.pride.tools.cluster.model.AssaySummary;
-import uk.ac.ebi.pride.tools.cluster.model.PSMSummary;
-import uk.ac.ebi.pride.tools.cluster.model.SpectrumSummary;
-import uk.ac.ebi.pride.tools.cluster.repo.ArchiveMetaDataWriter;
+import uk.ac.ebi.pride.tools.cluster.dao.TransactionAwareClusterWriter;
 import uk.ac.ebi.pride.tools.cluster.repo.ArchiveRepositoryBuilder;
 import uk.ac.ebi.pride.tools.cluster.repo.ClusterRepositoryBuilder;
-import uk.ac.ebi.pride.tools.cluster.repo.IArchiveMetaDataWriteDao;
 import uk.ac.ebi.pride.tools.cluster.utils.Constants;
 import uk.ac.ebi.pride.tools.cluster.utils.MzTabIndexer;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
@@ -55,14 +55,14 @@ public class ArchiveProjectAnnotator {
     public static final Logger logger = LoggerFactory.getLogger(ArchiveProjectAnnotator.class);
 
     private final ArchiveRepositoryBuilder archiveRepositoryBuilder;
-    private final IArchiveMetaDataWriteDao clusterMetaDataLoader;
+    private final IClusterWriteDao clusterWriter;
     private final String archiveFileRootPath;
 
     public ArchiveProjectAnnotator(ArchiveRepositoryBuilder archiveRepositoryBuilder,
-                                   IArchiveMetaDataWriteDao clusterMetaDataLoader,
+                                   IClusterWriteDao clusterWriter,
                                    String archiveFileRootPath) {
         this.archiveRepositoryBuilder = archiveRepositoryBuilder;
-        this.clusterMetaDataLoader = clusterMetaDataLoader;
+        this.clusterWriter = clusterWriter;
         this.archiveFileRootPath = archiveFileRootPath;
     }
 
@@ -124,7 +124,7 @@ public class ArchiveProjectAnnotator {
      * Load all the metadata into data store
      *
      * @param project   project object
-     * @param assay     assasy object
+     * @param assay     assay object
      * @param mzTabFile mzTab file
      */
     private void loadMetaDataByMgfs(Project project, Assay assay, File mzTabFile, String projectFilePath) throws IOException {
@@ -138,8 +138,8 @@ public class ArchiveProjectAnnotator {
         }
 
         if (mzTabIndexer != null) {
-            AssaySummary assaySummary = SummaryFactory.summariseAssay(project, assay);
-            clusterMetaDataLoader.saveAssay(assaySummary);
+            AssayDetail assaySummary = SummaryFactory.summariseAssay(project, assay);
+            clusterWriter.saveAssay(assaySummary);
             logger.info("Assay summary annotated. Assay database id: {}", assaySummary.getId());
 
             Set<String> msRunFileNames = mzTabIndexer.getMsRunFileNames();
@@ -163,7 +163,7 @@ public class ArchiveProjectAnnotator {
      * @param mgfFile      MGF file to load
      * @throws IOException
      */
-    private void loadMetaDataByMgf(AssaySummary assaySummary, MzTabIndexer mzTabIndexer, File mgfFile) throws IOException {
+    private void loadMetaDataByMgf(AssayDetail assaySummary, MzTabIndexer mzTabIndexer, File mgfFile) throws IOException {
         Long assaySummaryId = assaySummary.getId();
         String assayAccession = assaySummary.getAccession();
         String projectAccession = assaySummary.getProjectAccession();
@@ -173,7 +173,7 @@ public class ArchiveProjectAnnotator {
         LineNumberReader rdr = null;
         try {
             rdr = new LineNumberReader(new FileReader(mgfFile));
-            Map<SpectrumSummary, List<PSMSummary>> spectrumSummaryBuffer = new HashMap<SpectrumSummary, List<PSMSummary>>();
+            Map<SpectrumDetail, List<PSMDetail>> spectrumSummaryBuffer = new HashMap<SpectrumDetail, List<PSMDetail>>();
             ISpectrum spectrum;
             while ((spectrum = ParserUtilities.readMGFScan(rdr)) != null) {
                 if (spectrum.getPrecursorCharge() > 0 && spectrum.getPrecursorMz() > 0) {
@@ -185,10 +185,10 @@ public class ArchiveProjectAnnotator {
                             spectrumSummaryBuffer.clear();
                         }
 
-                        SpectrumSummary spectrumSummary = SummaryFactory.summariseSpectrum(spectrum, assaySummaryId, true);
-                        List<PSMSummary> psmSummaries = new ArrayList<PSMSummary>();
+                        SpectrumDetail spectrumSummary = SummaryFactory.summariseSpectrum(spectrum, assaySummaryId, true);
+                        List<PSMDetail> psmSummaries = new ArrayList<PSMDetail>();
                         for (PSM psm : psms) {
-                            PSMSummary psmSummary = SummaryFactory.summarisePSM(psm, projectAccession, assaySummaryId, assayAccession, numberOfMsRuns);
+                            PSMDetail psmSummary = SummaryFactory.summarisePSM(psm, projectAccession, assaySummaryId, assayAccession, numberOfMsRuns);
                             psmSummaries.add(psmSummary);
                         }
                         spectrumSummaryBuffer.put(spectrumSummary, psmSummaries);
@@ -204,15 +204,15 @@ public class ArchiveProjectAnnotator {
         }
     }
 
-    private void storeSpectrumAndPSM(Map<SpectrumSummary, List<PSMSummary>> spectrumSummaryBuffer) {
-        clusterMetaDataLoader.saveSpectra(new ArrayList<SpectrumSummary>(spectrumSummaryBuffer.keySet()));
+    private void storeSpectrumAndPSM(Map<SpectrumDetail, List<PSMDetail>> spectrumSummaryBuffer) {
+        clusterWriter.saveSpectra(new ArrayList<SpectrumDetail>(spectrumSummaryBuffer.keySet()));
 
-        List<PSMSummary> psmSummaries = new ArrayList<PSMSummary>();
-        for (Map.Entry<SpectrumSummary, List<PSMSummary>> spectrumSummaryListEntry : spectrumSummaryBuffer.entrySet()) {
-            SpectrumSummary spectrum = spectrumSummaryListEntry.getKey();
-            List<PSMSummary> psms = spectrumSummaryListEntry.getValue();
+        List<PSMDetail> psmSummaries = new ArrayList<PSMDetail>();
+        for (Map.Entry<SpectrumDetail, List<PSMDetail>> spectrumSummaryListEntry : spectrumSummaryBuffer.entrySet()) {
+            SpectrumDetail spectrum = spectrumSummaryListEntry.getKey();
+            List<PSMDetail> psms = spectrumSummaryListEntry.getValue();
 
-            for (PSMSummary psm : psms) {
+            for (PSMDetail psm : psms) {
                 psm.setSpectrumId(spectrum.getId());
                 if (!psmSummaries.contains(psm)) {
                     psmSummaries.add(psm);
@@ -220,7 +220,7 @@ public class ArchiveProjectAnnotator {
             }
         }
 
-        clusterMetaDataLoader.savePSMs(psmSummaries);
+        clusterWriter.savePSMs(psmSummaries);
     }
 
     protected Set<PSM> getPSM(String spectrumId, MzTabIndexer mzTabIndexer) {
@@ -304,7 +304,6 @@ public class ArchiveProjectAnnotator {
         return null;
     }
 
-
     public static void main(String[] args) {
         String archiveRootFilePath = args[0];
         String projectAccession = args[1];
@@ -312,17 +311,17 @@ public class ArchiveProjectAnnotator {
         // create connection to databases
         ArchiveRepositoryBuilder archiveRepositoryBuilder = new ArchiveRepositoryBuilder("prop/archive-database-oracle.properties");
         ClusterRepositoryBuilder clusterRepositoryBuilder = new ClusterRepositoryBuilder("prop/cluster-database-oracle.properties");
-        ArchiveMetaDataWriter metaDataLoader = new ArchiveMetaDataWriter(clusterRepositoryBuilder.getTransactionManager());
+        IClusterWriteDao writer = new TransactionAwareClusterWriter(clusterRepositoryBuilder.getTransactionManager());
 
         // create project annotator
-        ArchiveProjectAnnotator annotator = new ArchiveProjectAnnotator(archiveRepositoryBuilder, metaDataLoader, archiveRootFilePath);
+        ArchiveProjectAnnotator annotator = new ArchiveProjectAnnotator(archiveRepositoryBuilder, writer, archiveRootFilePath);
 
         // define transaction
         try {
             annotator.annotate(projectAccession);
         } catch (Exception ex) {
             // delete persisted records if there is an exception
-            metaDataLoader.deleteAssayByProjectAccession(projectAccession);
+            writer.deleteAssayByProjectAccession(projectAccession);
 
             String message = "Error loading project metadata into PRIDE cluster: " + projectAccession;
             throw new IllegalStateException(message, ex);
