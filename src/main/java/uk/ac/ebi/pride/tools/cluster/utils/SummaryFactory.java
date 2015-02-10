@@ -12,14 +12,13 @@ import uk.ac.ebi.pride.jmztab.model.PSM;
 import uk.ac.ebi.pride.jmztab.model.Param;
 import uk.ac.ebi.pride.jmztab.model.SplitList;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
+import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.IPeptideSpectrumMatch;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.spectracluster.repo.model.*;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Factory methods for converting external objects to data source friendly version
@@ -263,14 +262,36 @@ public final class SummaryFactory {
 
         clusterSummary.setMaxPeptideRatio(cluster.getMaxRatio());
 
+        String maxSequence = cluster.getMaxSequence();
+        Set<String> projects = new HashSet<String>();
+
         for (ISpectrumReference spectrumReference : spectrumReferences) {
             ClusteredSpectrumDetail clusteredSpectrumSummary = new ClusteredSpectrumDetail();
-            clusteredSpectrumSummary.setReferenceId(spectrumReference.getSpectrumId());
+            String spectrumId = spectrumReference.getSpectrumId();
+            clusteredSpectrumSummary.setReferenceId(spectrumId);
             clusteredSpectrumSummary.setSimilarityScore(spectrumReference.getSimilarityScore());
             clusterSummary.addClusteredSpectrumSummary(clusteredSpectrumSummary);
+
+            if (hasMaxSequence(spectrumReference, maxSequence)) {
+                // get project accession
+                String[] parts = spectrumId.split(";");
+                projects.add(parts[0]);
+            }
         }
 
+        clusterSummary.setNumberOfProjects(projects.size());
+
         return clusterSummary;
+    }
+
+    private static boolean hasMaxSequence(ISpectrumReference spectrumReference, String maxSequence) {
+        for (IPeptideSpectrumMatch peptideSpectrumMatch : spectrumReference.getPSMs()) {
+            if (peptideSpectrumMatch.getSequence().equalsIgnoreCase(maxSequence)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
