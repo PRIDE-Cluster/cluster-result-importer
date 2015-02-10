@@ -150,6 +150,9 @@ public final class SummaryFactory {
         if (modifications != null && !modifications.isEmpty()) {
             Collections.sort(modifications, ModificationComparator.getInstance());
             psmSummary.setModifications(modifications.toString());
+
+            // standardised modification
+            //todo: this implementation needs to be check with Noe
         }
 
         // search engine
@@ -214,6 +217,8 @@ public final class SummaryFactory {
         return psmSummary;
     }
 
+
+
     private static String buildArchivePSMId(String projectAccession, String assayAccession, PSM psm) {
         return projectAccession + "_"
                 + assayAccession + "_"
@@ -221,7 +226,6 @@ public final class SummaryFactory {
                 + psm.getAccession() + "_"
                 + PeptideUtils.cleanPeptideSequence(psm.getSequence());
     }
-
 
     public static SpectrumDetail summariseSpectrum(ISpectrum spectrum, Long assayId, boolean identified) {
         SpectrumDetail spectrumSummary = new SpectrumDetail();
@@ -238,6 +242,8 @@ public final class SummaryFactory {
 
     public static ClusterDetail summariseCluster(ICluster cluster) throws IOException {
         ClusterDetail clusterSummary = new ClusterDetail();
+
+        clusterSummary.setUUID(cluster.getId());
 
         clusterSummary.setAveragePrecursorMz(cluster.getAvPrecursorMz());
 

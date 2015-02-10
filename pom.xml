@@ -43,6 +43,7 @@
         <spectra-cluster.version>1.0.5-SNAPSHOT</spectra-cluster.version>
         <archive-data-provider-api.version>2.0.5</archive-data-provider-api.version>
         <spectra-cluster-repo.version>1.0.1-SNAPSHOT</spectra-cluster-repo.version>
+        <pride-mod.version>2.0.0-SNAPSHOT</pride-mod.version>
     </properties>
 
 	<build>
@@ -196,7 +197,12 @@
             <version>${archive-repo.version}</version>
         </dependency>
 
-
+        <!-- pride mod library -->
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>pride-mod</artifactId>
+            <version>${pride-mod.version}</version>
+        </dependency>
 
 	</dependencies>
 
