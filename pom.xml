@@ -39,7 +39,7 @@
         <spring-jdbc.version>3.2.9.RELEASE</spring-jdbc.version>
         <oracle-thin.version>11.2.0.1.0</oracle-thin.version>
         <archive-repo.version>0.1.19-SNAPSHOT</archive-repo.version>
-        <jmztab.version>3.0.0</jmztab.version>
+        <jmztab.version>3.0.2-SNAPSHOT</jmztab.version>
         <spectra-cluster.version>1.0.5-SNAPSHOT</spectra-cluster.version>
         <archive-data-provider-api.version>2.0.5</archive-data-provider-api.version>
         <spectra-cluster-repo.version>1.0.1-SNAPSHOT</spectra-cluster-repo.version>

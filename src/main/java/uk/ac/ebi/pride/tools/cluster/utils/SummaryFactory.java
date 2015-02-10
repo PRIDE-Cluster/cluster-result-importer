@@ -18,6 +18,7 @@ import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -131,8 +132,8 @@ public final class SummaryFactory {
      * @return
      */
     public static PSMDetail summarisePSM(PSM psm, String projectAccession,
-                                          Long assayId, String assayAccession,
-                                          int numOfMsRun) {
+                                         Long assayId, String assayAccession,
+                                         int numOfMsRun) {
         PSMDetail psmSummary = new PSMDetail();
 
         psmSummary.setAssayId(assayId);
@@ -146,8 +147,10 @@ public final class SummaryFactory {
 
         // modification
         SplitList<Modification> modifications = psm.getModifications();
-        if (modifications != null && !modifications.isEmpty())
+        if (modifications != null && !modifications.isEmpty()) {
+            Collections.sort(modifications, ModificationComparator.getInstance());
             psmSummary.setModifications(modifications.toString());
+        }
 
         // search engine
         String searchEngine = "";
