@@ -58,4 +58,10 @@ public class ModificationMapper {
     public PTM getPTMbyAccession(String accession) {
         return prideModDataAccessController.getPTMbyAccession(accession);
     }
+
+    public static void main(String[] args) {
+        ModificationMapper modificationMapper = ModificationMapper.getInstance();
+        PTM ptMbyAccession = modificationMapper.getPTMbyAccession("MOD:00781");
+        System.out.println("test");
+    }
 }

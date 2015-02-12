@@ -11,7 +11,7 @@ PROJECT_ACCESSION=$2
 # the name to give to the LSF job (to be extended with additional info)
 JOB_NAME="PRIDE-CLUSTER-ANNOTATION-${PROJECT_ACCESSION}C"
 # memory limit in MGb
-MEMORY_LIMIT=10000
+MEMORY_LIMIT=50000
 # LSF email notification
 JOB_EMAIL="rwang@ebi.ac.uk"
 

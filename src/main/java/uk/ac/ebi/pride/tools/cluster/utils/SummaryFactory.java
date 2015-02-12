@@ -270,7 +270,7 @@ public final class SummaryFactory {
             String spectrumId = spectrumReference.getSpectrumId();
             clusteredSpectrumSummary.setReferenceId(spectrumId);
             clusteredSpectrumSummary.setSimilarityScore(spectrumReference.getSimilarityScore());
-            clusterSummary.addClusteredSpectrumSummary(clusteredSpectrumSummary);
+            clusterSummary.addClusteredSpectrumDetail(clusteredSpectrumSummary);
 
             if (hasMaxSequence(spectrumReference, maxSequence)) {
                 // get project accession
