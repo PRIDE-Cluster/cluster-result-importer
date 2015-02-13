@@ -4,14 +4,6 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>log/spectra-cluster-importer.log</file>
-
-        <encoder>
-            <pattern>%msg%n</pattern>         `
-        </encoder>
-    </appender>
-
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%msg%n</pattern>
