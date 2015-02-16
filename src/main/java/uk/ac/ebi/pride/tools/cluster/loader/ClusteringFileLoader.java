@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Rui Wang
@@ -27,6 +29,8 @@ import java.util.Collection;
 public class ClusteringFileLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteringFileLoader.class);
+
+    private static final Pattern AMINO_ACID_PATTERN = Pattern.compile("[ABCDEFGHIJKLMNPQRSTUVWXYZ]+");
 
     public static void main(String[] args) {
         CommandLineParser parser = new GnuParser();
@@ -49,7 +53,6 @@ public class ClusteringFileLoader {
 
             if (!file.exists())
                 throw new Exception("Input .clustering file must be valid.");
-
 
             loadClusteringFile(file);
 
@@ -96,8 +99,14 @@ public class ClusteringFileLoader {
         public void onNewClusterRead(ICluster newCluster) {
             try {
                 if (newCluster.getSpecCount() > 1) {
-                    ClusterDetail clusterSummary = SummaryFactory.summariseCluster(newCluster);
-                    clusterImporter.saveCluster(clusterSummary);
+                    String maxSequence = newCluster.getMaxSequence();
+                    Matcher matcher = AMINO_ACID_PATTERN.matcher(maxSequence);
+
+                    // remove clusters that identify illegal peptide sequences
+                    if (matcher.matches()) {
+                        ClusterDetail clusterSummary = SummaryFactory.summariseCluster(newCluster);
+                        clusterImporter.saveCluster(clusterSummary);
+                    }
                 }
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to summaries cluster", e);

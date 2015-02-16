@@ -10,7 +10,8 @@ public class CliOptions {
 
     public enum OPTIONS {
         // VARIABLES
-        FILE("in"),
+        FILE("input"),
+
         // ACTIONS
         HELP("help");
 
@@ -34,11 +35,11 @@ public class CliOptions {
 
     static {
         // VARIABLES
-        Option outpath = OptionBuilder
+        Option outPath = OptionBuilder
                 .hasArg()
-                .withDescription("the file to import into the database.")
+                .withDescription("The file to import into the database.")
                 .create(OPTIONS.FILE.getValue());
-        options.addOption(outpath);
+        options.addOption(outPath);
 
         // ACTIONS
         Option help = new Option(
