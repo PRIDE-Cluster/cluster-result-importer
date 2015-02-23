@@ -42,7 +42,7 @@
         <jmztab.version>3.0.2-SNAPSHOT</jmztab.version>
         <spectra-cluster.version>1.0.6-SNAPSHOT</spectra-cluster.version>
         <archive-data-provider-api.version>2.0.5</archive-data-provider-api.version>
-        <spectra-cluster-repo.version>1.0.1-SNAPSHOT</spectra-cluster-repo.version>
+        <spectra-cluster-repo.version>1.0.2-SNAPSHOT</spectra-cluster-repo.version>
         <pride-mod.version>2.0.0-SNAPSHOT</pride-mod.version>
     </properties>
 
