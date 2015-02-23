@@ -32,7 +32,7 @@ def get_public_project_accessions():
 def connect_archive():
     # connect to archive database
     archive_db = cx_Oracle.connect(
-        "USERNAME/PASSWORD@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=ora-vm-032.ebi.ac.uk)(PORT=1531))(CONNECT_DATA=(SERVICE_NAME=PRIDEPRO)))")
+        "${pride.repo.db.user}/${pride.repo.db.password}@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=ora-vm-032.ebi.ac.uk)(PORT=1531))(CONNECT_DATA=(SERVICE_NAME=PRIDEPRO)))")
 
     # Create an cursor object for archive database
     return archive_db.cursor()
