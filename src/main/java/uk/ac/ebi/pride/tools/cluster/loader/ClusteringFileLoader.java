@@ -11,7 +11,10 @@ import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.IClusterSourceList
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
 import uk.ac.ebi.pride.spectracluster.repo.dao.IClusterWriteDao;
 import uk.ac.ebi.pride.spectracluster.repo.model.ClusterDetail;
+import uk.ac.ebi.pride.spectracluster.repo.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.dao.TransactionAwareClusterWriter;
+import uk.ac.ebi.pride.tools.cluster.quality.ClusterSummaryQualityDecider;
+import uk.ac.ebi.pride.tools.cluster.quality.IClusterQualityDecider;
 import uk.ac.ebi.pride.tools.cluster.repo.ClusterRepositoryBuilder;
 import uk.ac.ebi.pride.tools.cluster.utils.SummaryFactory;
 
@@ -72,8 +75,11 @@ public class ClusteringFileLoader {
         // create cluster importer
         IClusterWriteDao clusterDBImporter = new TransactionAwareClusterWriter(clusterRepositoryBuilder.getTransactionManager());
 
+        // create cluster quality decider
+        ClusterSummaryQualityDecider clusterSummaryQualityDecider = new ClusterSummaryQualityDecider(10, 2, 0.7f);
+
         // create cluster source listener
-        ClusterSourceListener clusterSourceListener = new ClusterSourceListener(clusterDBImporter);
+        ClusterSourceListener clusterSourceListener = new ClusterSourceListener(clusterDBImporter, clusterSummaryQualityDecider);
         Collection<IClusterSourceListener> clusterSourceListeners = new ArrayList<IClusterSourceListener>();
         clusterSourceListeners.add(clusterSourceListener);
 
@@ -90,9 +96,11 @@ public class ClusteringFileLoader {
     private static class ClusterSourceListener implements IClusterSourceListener {
 
         private final IClusterWriteDao clusterImporter;
+        private final IClusterQualityDecider<ClusterSummary> clusterQualityDecider;
 
-        private ClusterSourceListener(IClusterWriteDao clusterImporter) {
+        public ClusterSourceListener(IClusterWriteDao clusterImporter, IClusterQualityDecider<ClusterSummary> clusterQualityDecider) {
             this.clusterImporter = clusterImporter;
+            this.clusterQualityDecider = clusterQualityDecider;
         }
 
         @Override
@@ -104,7 +112,7 @@ public class ClusteringFileLoader {
 
                     // remove clusters that identify illegal peptide sequences
                     if (matcher.matches()) {
-                        ClusterDetail clusterSummary = SummaryFactory.summariseCluster(newCluster);
+                        ClusterDetail clusterSummary = SummaryFactory.summariseCluster(newCluster, clusterQualityDecider);
                         clusterImporter.saveCluster(clusterSummary);
                     }
                 }

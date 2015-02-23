@@ -16,6 +16,7 @@ import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.IPeptideSpect
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.spectracluster.repo.model.*;
 import uk.ac.ebi.pride.spectracluster.spectrum.ISpectrum;
+import uk.ac.ebi.pride.tools.cluster.quality.IClusterQualityDecider;
 
 import java.io.IOException;
 import java.util.*;
@@ -239,7 +240,7 @@ public final class SummaryFactory {
     }
 
 
-    public static ClusterDetail summariseCluster(ICluster cluster) throws IOException {
+    public static ClusterDetail summariseCluster(ICluster cluster, IClusterQualityDecider<ClusterSummary> clusterQualityDecider) throws IOException {
         ClusterDetail clusterSummary = new ClusterDetail();
 
         clusterSummary.setUUID(cluster.getId());
@@ -280,6 +281,11 @@ public final class SummaryFactory {
         }
 
         clusterSummary.setNumberOfProjects(projects.size());
+
+
+        // cluster quality
+        ClusterQuality clusterQuality = clusterQualityDecider.decideQuality(clusterSummary);
+        clusterSummary.setQuality(clusterQuality);
 
         return clusterSummary;
     }
