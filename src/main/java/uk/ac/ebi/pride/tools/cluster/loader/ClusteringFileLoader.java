@@ -118,6 +118,10 @@ public class ClusteringFileLoader {
                 }
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to summaries cluster", e);
+            } catch (Exception ex) {
+
+                //todo: this should be removed when we have re-run the clustering
+                logger.error("Failed to persist cluster: " + newCluster.getId(), ex);
             }
         }
     }
