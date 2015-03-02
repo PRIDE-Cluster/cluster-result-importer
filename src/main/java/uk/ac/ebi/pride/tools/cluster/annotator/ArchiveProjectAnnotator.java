@@ -14,7 +14,7 @@ import uk.ac.ebi.pride.archive.repo.project.ProjectRepository;
 import uk.ac.ebi.pride.jmztab.model.MsRun;
 import uk.ac.ebi.pride.jmztab.model.PSM;
 import uk.ac.ebi.pride.spectracluster.io.ParserUtilities;
-import uk.ac.ebi.pride.spectracluster.repo.dao.IClusterWriteDao;
+import uk.ac.ebi.pride.spectracluster.repo.dao.cluster.IClusterWriteDao;
 import uk.ac.ebi.pride.spectracluster.repo.model.AssayDetail;
 import uk.ac.ebi.pride.spectracluster.repo.model.PSMDetail;
 import uk.ac.ebi.pride.spectracluster.repo.model.SpectrumDetail;

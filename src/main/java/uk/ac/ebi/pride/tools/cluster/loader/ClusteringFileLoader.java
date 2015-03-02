@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.ClusteringFileReader;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.io.IClusterSourceListener;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
-import uk.ac.ebi.pride.spectracluster.repo.dao.IClusterWriteDao;
+import uk.ac.ebi.pride.spectracluster.repo.dao.cluster.IClusterWriteDao;
 import uk.ac.ebi.pride.spectracluster.repo.model.ClusterDetail;
 import uk.ac.ebi.pride.spectracluster.repo.model.ClusterSummary;
 import uk.ac.ebi.pride.tools.cluster.dao.TransactionAwareClusterWriter;
