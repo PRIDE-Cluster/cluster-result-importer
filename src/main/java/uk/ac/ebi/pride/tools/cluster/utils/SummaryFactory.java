@@ -280,14 +280,20 @@ public final class SummaryFactory {
             clusterSummary.addClusteredSpectrumDetail(clusteredSpectrumSummary);
 
             String[] spectrumIdParts = spectrumId.split(";");
+            String spec = spectrumReference.getSpecies();
             String projectAccession = spectrumIdParts[0];
             if (hasMaxSequence(spectrumReference, maxSequence)) {
                 // get project accession
                 projects.add(projectAccession);
+
                 // spectra
                 spectra.add(spectrumId);
+
                 // species
-                species.add(spectrumReference.getSpecies());
+                if (spec != null) {
+                    species.addAll(Arrays.asList(spec.split(",")));
+                }
+
                 // ptm
                 for (IPeptideSpectrumMatch peptideSpectrumMatch : spectrumReference.getPSMs()) {
                     for (IModification modification : peptideSpectrumMatch.getModifications()) {
@@ -298,7 +304,9 @@ public final class SummaryFactory {
 
             // total numbers
             totalProjects.add(projectAccession);
-            totalSpecies.add(spectrumReference.getSpecies());
+            if (spec != null) {
+                totalSpecies.addAll(Arrays.asList(spec.split(",")));
+            }
             for (IPeptideSpectrumMatch peptideSpectrumMatch : spectrumReference.getPSMs()) {
                 for (IModification modification : peptideSpectrumMatch.getModifications()) {
                     totalPtms.add(modification.getAccession());

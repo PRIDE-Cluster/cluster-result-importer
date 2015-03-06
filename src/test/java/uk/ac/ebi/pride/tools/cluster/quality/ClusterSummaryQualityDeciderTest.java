@@ -19,13 +19,13 @@ public class ClusterSummaryQualityDeciderTest {
     @Test
     public void testNumberOfSpectra() throws Exception {
         ClusterSummary clusterSummary = new ClusterSummary();
-        clusterSummary.setNumberOfSpectra(9);
+        clusterSummary.setTotalNumberOfSpectra(9);
         clusterSummary.setNumberOfProjects(2);
         clusterSummary.setMaxPeptideRatio(0.7f);
 
         assertEquals(ClusterQuality.LOW, clusterSummaryQualityDecider.decideQuality(clusterSummary));
 
-        clusterSummary.setNumberOfSpectra(10);
+        clusterSummary.setTotalNumberOfSpectra(10);
 
         assertEquals(ClusterQuality.HIGH, clusterSummaryQualityDecider.decideQuality(clusterSummary));
     }
@@ -33,7 +33,7 @@ public class ClusterSummaryQualityDeciderTest {
     @Test
     public void testMaxRatio() throws Exception {
         ClusterSummary clusterSummary = new ClusterSummary();
-        clusterSummary.setNumberOfSpectra(10);
+        clusterSummary.setTotalNumberOfSpectra(10);
         clusterSummary.setNumberOfProjects(2);
         clusterSummary.setMaxPeptideRatio(0.69f);
 
@@ -47,7 +47,7 @@ public class ClusterSummaryQualityDeciderTest {
     @Test
     public void testNumberOfProjects() throws Exception {
         ClusterSummary clusterSummary = new ClusterSummary();
-        clusterSummary.setNumberOfSpectra(10);
+        clusterSummary.setTotalNumberOfSpectra(10);
         clusterSummary.setNumberOfProjects(1);
         clusterSummary.setMaxPeptideRatio(0.7f);
 
