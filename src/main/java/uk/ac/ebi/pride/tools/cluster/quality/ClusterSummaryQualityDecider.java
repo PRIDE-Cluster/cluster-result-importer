@@ -26,7 +26,7 @@ public class ClusterSummaryQualityDecider implements IClusterQualityDecider<Clus
     @Override
     public ClusterQuality decideQuality(ClusterSummary cluster) {
 
-        int numberOfSpectra = cluster.getNumberOfSpectra();
+        int numberOfSpectra = cluster.getTotalNumberOfSpectra();
         int numberOfProjects = cluster.getNumberOfProjects();
         float maxPeptideRatio = cluster.getMaxPeptideRatio();
 

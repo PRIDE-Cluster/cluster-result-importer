@@ -12,6 +12,7 @@ import uk.ac.ebi.pride.jmztab.model.PSM;
 import uk.ac.ebi.pride.jmztab.model.Param;
 import uk.ac.ebi.pride.jmztab.model.SplitList;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ICluster;
+import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.IModification;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.IPeptideSpectrumMatch;
 import uk.ac.ebi.pride.spectracluster.clusteringfilereader.objects.ISpectrumReference;
 import uk.ac.ebi.pride.spectracluster.repo.model.*;
@@ -259,12 +260,17 @@ public final class SummaryFactory {
         String consensusSpectrumIntensity = convertFloatListToString(consensusIntensValues, Constants.COMMA);
         clusterSummary.setConsensusSpectrumIntensity(consensusSpectrumIntensity);
 
-        clusterSummary.setNumberOfSpectra(cluster.getSpecCount());
-
         clusterSummary.setMaxPeptideRatio(cluster.getMaxRatio());
 
         String maxSequence = cluster.getMaxSequence();
         Set<String> projects = new HashSet<String>();
+        Set<String> totalProjects = new HashSet<String>();
+        Set<String> spectra = new HashSet<String>();
+        Set<String> species = new HashSet<String>();
+        Set<String> totalSpecies = new HashSet<String>();
+        Set<String> ptms = new HashSet<String>();
+        Set<String> totalPtms = new HashSet<String>();
+
 
         for (ISpectrumReference spectrumReference : spectrumReferences) {
             ClusteredSpectrumDetail clusteredSpectrumSummary = new ClusteredSpectrumDetail();
@@ -273,15 +279,44 @@ public final class SummaryFactory {
             clusteredSpectrumSummary.setSimilarityScore(spectrumReference.getSimilarityScore());
             clusterSummary.addClusteredSpectrumDetail(clusteredSpectrumSummary);
 
+            String[] spectrumIdParts = spectrumId.split(";");
+            String projectAccession = spectrumIdParts[0];
             if (hasMaxSequence(spectrumReference, maxSequence)) {
                 // get project accession
-                String[] parts = spectrumId.split(";");
-                projects.add(parts[0]);
+                projects.add(projectAccession);
+                // spectra
+                spectra.add(spectrumId);
+                // species
+                species.add(spectrumReference.getSpecies());
+                // ptm
+                for (IPeptideSpectrumMatch peptideSpectrumMatch : spectrumReference.getPSMs()) {
+                    for (IModification modification : peptideSpectrumMatch.getModifications()) {
+                        ptms.add(modification.getAccession());
+                    }
+                }
+            }
+
+            // total numbers
+            totalProjects.add(projectAccession);
+            totalSpecies.add(spectrumReference.getSpecies());
+            for (IPeptideSpectrumMatch peptideSpectrumMatch : spectrumReference.getPSMs()) {
+                for (IModification modification : peptideSpectrumMatch.getModifications()) {
+                    totalPtms.add(modification.getAccession());
+                }
             }
         }
 
-        clusterSummary.setNumberOfProjects(projects.size());
+        clusterSummary.setNumberOfSpectra(spectra.size());
+        clusterSummary.setTotalNumberOfSpectra(cluster.getSpecCount());
 
+        clusterSummary.setNumberOfProjects(projects.size());
+        clusterSummary.setTotalNumberOfProjects(totalProjects.size());
+
+        clusterSummary.setNumberOfSpecies(species.size());
+        clusterSummary.setTotalNumberOfSpecies(totalSpecies.size());
+
+        clusterSummary.setNumberOfPTMs(ptms.size());
+        clusterSummary.setTotalNumberOfPTMs(totalPtms.size());
 
         // cluster quality
         ClusterQuality clusterQuality = clusterQualityDecider.decideQuality(clusterSummary);
