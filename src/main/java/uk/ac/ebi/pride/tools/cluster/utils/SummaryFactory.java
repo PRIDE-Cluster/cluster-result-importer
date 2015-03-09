@@ -323,8 +323,8 @@ public final class SummaryFactory {
         clusterSummary.setNumberOfSpecies(species.size());
         clusterSummary.setTotalNumberOfSpecies(totalSpecies.size());
 
-        clusterSummary.setNumberOfPTMs(ptms.size());
-        clusterSummary.setTotalNumberOfPTMs(totalPtms.size());
+        clusterSummary.setNumberOfModifications(ptms.size());
+        clusterSummary.setTotalNumberOfModifications(totalPtms.size());
 
         // cluster quality
         ClusterQuality clusterQuality = clusterQualityDecider.decideQuality(clusterSummary);
