@@ -32,19 +32,6 @@ public class ClusteringDBStatsCollector {
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteringDBStatsCollector.class);
 
-    public static final String NUMBER_OF_CLUSTERS = "Number of clusters";
-    public static final String NUMBER_OF_HIGH_QUALITY_CLUSTERS = "Number of high quality clusters";
-    public static final String NUMBER_OF_MEDIUM_QUALITY_CLUSTERS = "Number of medium quality clusters";
-    public static final String NUMBER_OF_LOW_QUALITY_CLUSTERS = "Number of low quality clusters";
-    public static final String NUMBER_OF_SPECIES = "Number of species";
-    public static final String NUMBER_OF_PROJECTS = "Number of projects";
-    public static final String NUMBER_OF_ASSAYS = "Number of assays";
-    public static final String NUMBER_OF_DISTINCT_PEPTIDES = "Number of distinct peptides";
-    public static final String NUMBER_OF_IDENTIFIED_SPECTRA = "Number of identified spectra";
-    public static final String NUMBER_OF_CLUSTERS_PER_SPECIES = "Number of clusters per species - ";
-    public static final String NUMBER_OF_UNIQUE_PEPTIDES_PER_SPECIES = "Number of unique peptides per species - ";
-    public static final String OVERLAPPING_UNIQUE_PEPTIDES_ON_SPEICES = "Overlapping unique peptides on species - ";
-
 
     public static void main(String[] args) {
         // create data source
@@ -62,48 +49,48 @@ public class ClusteringDBStatsCollector {
 
         // number of clusters
         long numberOfClusters = clusterReader.getNumberOfClusters();
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_CLUSTERS, numberOfClusters));
-        logger.info(NUMBER_OF_CLUSTERS + " " + numberOfClusters + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_CLUSTERS, numberOfClusters));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_CLUSTERS + " " + numberOfClusters + "");
 
         // number of high quality clusters
         long numberOfHighQualityClusters = clusterReader.getNumberOfClustersByQuality(ClusterQuality.HIGH);
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_HIGH_QUALITY_CLUSTERS, numberOfHighQualityClusters));
-        logger.info(NUMBER_OF_HIGH_QUALITY_CLUSTERS + " " + numberOfHighQualityClusters + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_HIGH_QUALITY_CLUSTERS, numberOfHighQualityClusters));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_HIGH_QUALITY_CLUSTERS + " " + numberOfHighQualityClusters + "");
 
         // number of medium quality clusters
         long numberOfMediumQualityClusters = clusterReader.getNumberOfClustersByQuality(ClusterQuality.MEDIUM);
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_MEDIUM_QUALITY_CLUSTERS, numberOfMediumQualityClusters));
-        logger.info(NUMBER_OF_MEDIUM_QUALITY_CLUSTERS + " " + numberOfMediumQualityClusters + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_MEDIUM_QUALITY_CLUSTERS, numberOfMediumQualityClusters));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_MEDIUM_QUALITY_CLUSTERS + " " + numberOfMediumQualityClusters + "");
 
         // number of low quality clusters
         long numberOfLowQualityClusters = clusterReader.getNumberOfClustersByQuality(ClusterQuality.LOW);
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_LOW_QUALITY_CLUSTERS, numberOfLowQualityClusters));
-        logger.info(NUMBER_OF_LOW_QUALITY_CLUSTERS + " " + numberOfLowQualityClusters + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_LOW_QUALITY_CLUSTERS, numberOfLowQualityClusters));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_LOW_QUALITY_CLUSTERS + " " + numberOfLowQualityClusters + "");
 
         // number of species
         long numberOfClusteredSpecies = clusterReader.getNumberOfClusteredSpecies();
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_SPECIES, numberOfClusteredSpecies));
-        logger.info(NUMBER_OF_SPECIES + " " + numberOfClusteredSpecies + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_SPECIES, numberOfClusteredSpecies));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_SPECIES + " " + numberOfClusteredSpecies + "");
 
         // number of projects
         long numberOfClusteredProjects = clusterReader.getNumberOfClusteredProjects();
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_PROJECTS, numberOfClusteredProjects));
-        logger.info(NUMBER_OF_PROJECTS + " " + numberOfClusteredProjects + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_PROJECTS, numberOfClusteredProjects));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_PROJECTS + " " + numberOfClusteredProjects + "");
 
         // number of assays
         long numberOfClusteredAssays = clusterReader.getNumberOfClusteredAssays();
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_ASSAYS, numberOfClusteredAssays));
-        logger.info(NUMBER_OF_ASSAYS + " " + numberOfClusteredAssays + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_ASSAYS, numberOfClusteredAssays));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_ASSAYS + " " + numberOfClusteredAssays + "");
 
         // number of distinct peptides
         long numberOfClusteredDistinctPeptides = clusterReader.getNumberOfClusteredDistinctPeptides();
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_DISTINCT_PEPTIDES, numberOfClusteredDistinctPeptides));
-        logger.info(NUMBER_OF_DISTINCT_PEPTIDES + " " + numberOfClusteredDistinctPeptides + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_DISTINCT_PEPTIDES, numberOfClusteredDistinctPeptides));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_DISTINCT_PEPTIDES + " " + numberOfClusteredDistinctPeptides + "");
 
         // number of identified spectra
         long numberOfClusteredIdentifiedSpectra = clusterReader.getNumberOfClusteredIdentifiedSpectra();
-        statistics.add(new ClusterRepoStatistics(NUMBER_OF_IDENTIFIED_SPECTRA, numberOfClusteredIdentifiedSpectra));
-        logger.info(NUMBER_OF_IDENTIFIED_SPECTRA + " " + numberOfClusteredIdentifiedSpectra + "");
+        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_IDENTIFIED_SPECTRA, numberOfClusteredIdentifiedSpectra));
+        logger.info(ClusterRepoStatistics.NUMBER_OF_IDENTIFIED_SPECTRA + " " + numberOfClusteredIdentifiedSpectra + "");
 
         // write statistics
         clusterRepoStatisticsWriter.saveStatistics(statistics);
@@ -159,14 +146,14 @@ public class ClusteringDBStatsCollector {
 
         // store cluster counts
         for (Map.Entry<String, Long> clusterCount : clusterCounts.entrySet()) {
-            statistics.add(new ClusterRepoStatistics(NUMBER_OF_CLUSTERS_PER_SPECIES + clusterCount.getKey(), clusterCount.getValue()));
+            statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_CLUSTERS_PER_SPECIES + "-" + clusterCount.getKey(), clusterCount.getValue()));
         }
         clusterRepoStatisticsWriter.saveStatistics(statistics);
         statistics.clear();
 
         // store unique peptide counts
         for (Map.Entry<String, Set<String>> uniquePeptideCount : uniquePeptides.entrySet()) {
-            statistics.add(new ClusterRepoStatistics(NUMBER_OF_UNIQUE_PEPTIDES_PER_SPECIES + uniquePeptideCount.getKey(), (long)uniquePeptideCount.getValue().size()));
+            statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_UNIQUE_PEPTIDES_PER_SPECIES + "-" + uniquePeptideCount.getKey(), (long) uniquePeptideCount.getValue().size()));
         }
         clusterRepoStatisticsWriter.saveStatistics(statistics);
         statistics.clear();
@@ -179,7 +166,7 @@ public class ClusteringDBStatsCollector {
             for (String speciesToCompare : uniquePeptides.keySet()) {
                 if (!species.equals(speciesToCompare)) {
                     int intersection = CollectionUtils.countIntersection(peptides, uniquePeptides.get(speciesToCompare));
-                    statistics.add(new ClusterRepoStatistics(OVERLAPPING_UNIQUE_PEPTIDES_ON_SPEICES + species + "-" + speciesToCompare, (long)intersection));
+                    statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.OVERLAPPING_UNIQUE_PEPTIDES_ON_SPEICES + "-" + species + "-" + speciesToCompare, (long) intersection));
                 }
             }
         }
