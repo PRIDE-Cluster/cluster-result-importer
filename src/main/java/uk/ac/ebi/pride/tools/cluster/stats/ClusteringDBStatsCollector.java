@@ -83,14 +83,14 @@ public class ClusteringDBStatsCollector {
         logger.info(ClusterRepoStatistics.NUMBER_OF_ASSAYS + " " + numberOfClusteredAssays + "");
 
         // number of distinct peptides
-        long numberOfClusteredDistinctPeptides = clusterReader.getNumberOfClusteredDistinctPeptides();
-        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_DISTINCT_PEPTIDES, numberOfClusteredDistinctPeptides));
-        logger.info(ClusterRepoStatistics.NUMBER_OF_DISTINCT_PEPTIDES + " " + numberOfClusteredDistinctPeptides + "");
+//        long numberOfClusteredDistinctPeptides = clusterReader.getNumberOfClusteredDistinctPeptides();
+//        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_DISTINCT_PEPTIDES, numberOfClusteredDistinctPeptides));
+//        logger.info(ClusterRepoStatistics.NUMBER_OF_DISTINCT_PEPTIDES + " " + numberOfClusteredDistinctPeptides + "");
 
         // number of identified spectra
-        long numberOfClusteredIdentifiedSpectra = clusterReader.getNumberOfClusteredIdentifiedSpectra();
-        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_IDENTIFIED_SPECTRA, numberOfClusteredIdentifiedSpectra));
-        logger.info(ClusterRepoStatistics.NUMBER_OF_IDENTIFIED_SPECTRA + " " + numberOfClusteredIdentifiedSpectra + "");
+//        long numberOfClusteredIdentifiedSpectra = clusterReader.getNumberOfClusteredIdentifiedSpectra();
+//        statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_IDENTIFIED_SPECTRA, numberOfClusteredIdentifiedSpectra));
+//        logger.info(ClusterRepoStatistics.NUMBER_OF_IDENTIFIED_SPECTRA + " " + numberOfClusteredIdentifiedSpectra + "");
 
         // write statistics
         clusterRepoStatisticsWriter.saveStatistics(statistics);
@@ -126,7 +126,7 @@ public class ClusteringDBStatsCollector {
 
                 List<ClusteredPSMDetail> psmDetails = cluster.getClusteredPSMDetails();
                 for (ClusteredPSMDetail psmDetail : psmDetails) {
-                    if (psmDetail.getPsmRatio() == 1.1) {
+                    if (psmDetail.getRank() == 1.1f) {
                         String sequence = psmDetail.getSequence();
                         Long assayId = psmDetail.getPsmDetail().getAssayId();
                         AssayDetail assayDetail = cluster.getAssayDetail(assayId);
