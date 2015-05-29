@@ -28,7 +28,7 @@
         <fileSet>
             <directory>${project.basedir}/scripts</directory>
             <includes>
-                <include>*</include>
+                <include>**/*</include>
             </includes>
             <outputDirectory>/</outputDirectory>
             <filtered>true</filtered>
