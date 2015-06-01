@@ -146,14 +146,14 @@ public class ClusteringDBStatsCollector {
 
         // store cluster counts
         for (Map.Entry<String, Long> clusterCount : clusterCounts.entrySet()) {
-            statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_CLUSTERS_PER_SPECIES + "-" + clusterCount.getKey(), clusterCount.getValue()));
+            statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_CLUSTERS_PER_SPECIES + "|" + clusterCount.getKey(), clusterCount.getValue()));
         }
         clusterRepoStatisticsWriter.saveStatistics(statistics);
         statistics.clear();
 
         // store unique peptide counts
         for (Map.Entry<String, Set<String>> uniquePeptideCount : uniquePeptides.entrySet()) {
-            statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_UNIQUE_PEPTIDES_PER_SPECIES + "-" + uniquePeptideCount.getKey(), (long) uniquePeptideCount.getValue().size()));
+            statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.NUMBER_OF_UNIQUE_PEPTIDES_PER_SPECIES + "|" + uniquePeptideCount.getKey(), (long) uniquePeptideCount.getValue().size()));
         }
         clusterRepoStatisticsWriter.saveStatistics(statistics);
         statistics.clear();
@@ -166,7 +166,7 @@ public class ClusteringDBStatsCollector {
             for (String speciesToCompare : uniquePeptides.keySet()) {
                 if (!species.equals(speciesToCompare)) {
                     int intersection = CollectionUtils.countIntersection(peptides, uniquePeptides.get(speciesToCompare));
-                    statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.OVERLAPPING_UNIQUE_PEPTIDES_ON_SPEICES + "-" + species + "-" + speciesToCompare, (long) intersection));
+                    statistics.add(new ClusterRepoStatistics(ClusterRepoStatistics.OVERLAPPING_UNIQUE_PEPTIDES_ON_SPEICES + "|" + species + "|" + speciesToCompare, (long) intersection));
                 }
             }
         }
