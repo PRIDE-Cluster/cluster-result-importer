@@ -23,6 +23,7 @@ public class ModificationMapper {
     private final PRIDEModDataAccessController prideModDataAccessController;
 
     private ModificationMapper() {
+        // pride
         InputStream prideModStream = ModificationMapper.class.getClassLoader().getResourceAsStream("mod/pride_mods.xml");
         prideModDataAccessController = new PRIDEModDataAccessController(prideModStream);
     }
