@@ -270,6 +270,7 @@ public final class SummaryFactory {
         Set<String> totalSpecies = new HashSet<String>();
         Set<String> ptms = new HashSet<String>();
         Set<String> totalPtms = new HashSet<String>();
+        int numberOfPsms = 0;
 
 
         for (ISpectrumReference spectrumReference : spectrumReferences) {
@@ -294,8 +295,12 @@ public final class SummaryFactory {
                     species.addAll(Arrays.asList(spec.split(",")));
                 }
 
+                // psms
+                HashSet<IPeptideSpectrumMatch> uniquePsms = new HashSet<IPeptideSpectrumMatch>(spectrumReference.getPSMs());
+                numberOfPsms += uniquePsms.size();
+
                 // ptm
-                for (IPeptideSpectrumMatch peptideSpectrumMatch : spectrumReference.getPSMs()) {
+                for (IPeptideSpectrumMatch peptideSpectrumMatch : uniquePsms) {
                     for (IModification modification : peptideSpectrumMatch.getModifications()) {
                         ptms.add(modification.getAccession());
                     }
@@ -316,6 +321,9 @@ public final class SummaryFactory {
 
         clusterSummary.setNumberOfSpectra(spectra.size());
         clusterSummary.setTotalNumberOfSpectra(cluster.getSpecCount());
+
+        clusterSummary.setNumberOfPSMs(numberOfPsms);
+        clusterSummary.setTotalNumberOfPSMs(cluster.getPsmCount());
 
         clusterSummary.setNumberOfProjects(projects.size());
         clusterSummary.setTotalNumberOfProjects(totalProjects.size());
