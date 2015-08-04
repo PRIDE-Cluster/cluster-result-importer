@@ -248,7 +248,12 @@ public final class SummaryFactory {
 
         clusterSummary.setAveragePrecursorMz(cluster.getAvPrecursorMz());
 
-        List<ISpectrumReference> spectrumReferences = cluster.getSpectrumReferences();
+        Collection<ISpectrumReference> spectrumReferences = cluster.getSpectrumReferences();
+
+        // remove duplicated spectra
+        UniqueSpectrumFunction uniqueSpectrumFunction = new UniqueSpectrumFunction();
+        spectrumReferences = uniqueSpectrumFunction.apply(spectrumReferences);
+
         int averagePrecursorCharge = calculateAveragePrecursorCharge(spectrumReferences);
         clusterSummary.setAveragePrecursorCharge(averagePrecursorCharge);
 
@@ -357,7 +362,7 @@ public final class SummaryFactory {
      * @param spectrumReferences a list of spectra
      * @return average precursor charge
      */
-    public static int calculateAveragePrecursorCharge(List<ISpectrumReference> spectrumReferences) {
+    public static int calculateAveragePrecursorCharge(Collection<ISpectrumReference> spectrumReferences) {
         int chargeSum = 0;
         for (ISpectrumReference spectrumReference : spectrumReferences) {
             int charge = spectrumReference.getCharge();
