@@ -76,7 +76,8 @@ public class ClusteringFileLoader {
         IClusterWriteDao clusterDBImporter = new TransactionAwareClusterWriter(clusterRepositoryBuilder.getTransactionManager());
 
         // create cluster quality decider
-        ClusterSummaryQualityDecider clusterSummaryQualityDecider = new ClusterSummaryQualityDecider(10, 2, 0.7f);
+        // todo: this can be changed to retrieving the numbers from command line input
+        ClusterSummaryQualityDecider clusterSummaryQualityDecider = new ClusterSummaryQualityDecider(4, 2, 0.7f);
 
         // create cluster source listener
         ClusterSourceListener clusterSourceListener = new ClusterSourceListener(clusterDBImporter, clusterSummaryQualityDecider);
