@@ -1,5 +1,7 @@
 package uk.ac.ebi.pride.tools.cluster.library;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import uk.ac.ebi.pride.spectracluster.repo.model.SpectrumLibraryDetail;
 import uk.ac.ebi.pride.tools.cluster.dao.TransactionAwareSpectrumLibraryWriter;
@@ -20,6 +22,8 @@ import java.util.Map;
  * @version $Id$
  */
 public class SpectrumLibraryImporter {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpectrumLibraryImporter.class);
 
     public static final String NUMBER_OF_PEPTIDE = "NUMBER_OF_PEPTIDE";
     public static final String NUMBER_OF_SPECTRA = "NUMBER_OF_SPECTRA";
@@ -61,16 +65,15 @@ public class SpectrumLibraryImporter {
         for (Map.Entry<String, Long> spectrumLibrary : spectrumLibraries.entrySet()) {
             SpectrumLibraryDetail spectrumLibraryDetail = new SpectrumLibraryDetail();
             String spectrumLibraryFileName = spectrumLibrary.getKey();
+            logger.info("Spectrum library: " + spectrumLibraryFileName);
             spectrumLibraryDetail.setFileName(spectrumLibraryFileName);
-            if (spectrumLibraryFileName.endsWith(".gz")) {
-                spectrumLibraryFileName = spectrumLibraryFileName.substring(0, spectrumLibraryFileName.length() - 3);
-            }
             spectrumLibraryDetail.setFileSize(spectrumLibrary.getValue());
             spectrumLibraryDetail.setVersion(version);
             spectrumLibraryDetail.setReleaseDate(releaseDate);
             // stats
             Map<String, Long> stats = spectrumLibraryStats.get(spectrumLibraryFileName);
             if (stats == null) {
+                logger.warn("No stats found for spectrum library: " + spectrumLibraryFileName);
                 continue;
             }
             spectrumLibraryDetail.setNumberOfSpectra(stats.get(NUMBER_OF_SPECTRA));
@@ -78,6 +81,7 @@ public class SpectrumLibraryImporter {
             // metadata
             Map<String, String> metadata = speciesMappings.get(spectrumLibraryFileName);
             if (metadata == null) {
+                logger.warn("No metadata found for spectrum library: " + spectrumLibraryFileName);
                 continue;
             }
             spectrumLibraryDetail.setSpeciesScientificName(metadata.get(SCIENTIFIC_NAME));
